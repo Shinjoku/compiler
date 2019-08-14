@@ -77,7 +77,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Environment\Instruction.cs" />
+    <Compile Include="Model\Instruction.cs" />
     <Compile Include="Line.xaml.cs">
       <DependentUpon>Line.xaml</DependentUpon>
     </Compile>
