@@ -9,36 +9,36 @@ namespace Compiler.Environment
     /// </summary>
     class VirtualMachine
     {
-        public static bool Run(List<Instruction> programCounter)
+        public static bool Run(List<Instruction> instructions)
         {
-            int i = 0;
+            int PC = 0;
             bool fin = false;
             Memory memory = new Memory();
 
-            while (i < programCounter.Count)
+            while (PC < instructions.Count)
             {
-                Console.WriteLine("Executando linha " + programCounter[i].Id +
-                    ". Comando: " + programCounter[i].Name + ". Valor SP: " +
+                Console.WriteLine("Executando linha " + instructions[PC].Id +
+                    ". Comando: " + instructions[PC].Name + ". Valor SP: " +
                     memory.StackPointer);
 
                 try
                 {
-                    switch (programCounter[i].Name)
+                    switch (instructions[PC].Name)
                     {
                         case "start":
                             memory.Start();
                             break;
 
                         case "ldc":
-                            memory.LoadConstant(programCounter[i].Parameters[0]);
+                            memory.LoadConstant(instructions[PC].Parameters[0]);
                             break;
 
                         case "ldv":
-                            memory.LoadValue(programCounter[i].Parameters[0]);
+                            memory.LoadValue(instructions[PC].Parameters[0]);
                             break;
 
                         case "str":
-                            memory.Store(programCounter[i].Parameters[0]);
+                            memory.Store(instructions[PC].Parameters[0]);
                             break;
 
                         case "add":
@@ -102,11 +102,11 @@ namespace Compiler.Environment
                             break;
 
                         case "jmp":
-                            i = memory.Jump(programCounter[i].Parameters[0]);
+                            PC = memory.Jump(instructions[PC].Parameters[0]);
                             break;
 
                         case "jmpf":
-                            i = memory.JumpIfFalse(programCounter[i].Parameters[0], i);
+                            PC = memory.JumpIfFalse(instructions[PC].Parameters[0], PC);
                             break;
 
                         case "null":
@@ -121,30 +121,31 @@ namespace Compiler.Environment
                             break;
 
                         case "alloc":
-                            memory.Allocate(programCounter[i].Parameters[0],
-                                programCounter[i].Parameters[1]);
+                            memory.Allocate(instructions[PC].Parameters[0],
+                                instructions[PC].Parameters[1]);
                             break;
 
                         case "dalloc":
-                            memory.Deallocate(programCounter[i].Parameters[0],
-                                programCounter[i].Parameters[1]);
+                            memory.Deallocate(instructions[PC].Parameters[0],
+                                instructions[PC].Parameters[1]);
                             break;
 
                         case "call":
-                            i = memory.Call(programCounter[i].Parameters[0], i);
+                            PC = memory.Call(instructions[PC].Parameters[0], PC);
                             break;
 
                         case "return":
-                            i = memory.Return();
+                            PC = memory.Return();
                             break;
                     }
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine("Line " + programCounter[i].Id + ": " + e);
+                    Console.WriteLine("Line " + instructions[PC].Id + ": " + e);
                 }
+                if (fin) break;
 
-                i++;
+                PC++;
             }
             if (fin) return true;
             return false;
