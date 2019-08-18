@@ -1,33 +1,49 @@
-﻿using Compiler.Model;
-using System;
-using System.ComponentModel;
-using System.IO;
+﻿using System.IO;
 using System.Text;
 using System.Windows.Controls;
-using System.Windows.Documents;
 using System.Windows.Input;
 using Microsoft.Win32;
-
+using System.Threading.Tasks;
+using System.ComponentModel;
 
 namespace Compiler
 {
     /// <summary>
     /// Interação lógica para TextEditor.xaml
     /// </summary>
-    public partial class TextEditor : UserControl
+    public partial class TextEditor : UserControl, INotifyPropertyChanged
     {
-        public string FilePath;
-        public string FileContent;
+        public string FilePath { get; set; }
+        private string _fileContent;
+        public string FileContent
+        {
+            get { return _fileContent; }
+            set
+            {
+                if (value != _fileContent)
+                {
+                    _fileContent = value;
+                    OnPropertyChanged("FileContent");
+                }
+            }
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected void OnPropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
 
         public TextEditor()
         {
             InitializeComponent();
+            Page.DataContext = this;
             KeyDown += new KeyEventHandler(SaveFile_KeyDown);
         }
 
         public void UpdateFileContent()
         {
-            Page.Text = ReadFile();
+            FileContent = ReadFile();
         }
 
         public string ReadFile()
@@ -50,13 +66,13 @@ namespace Compiler
             if(Keyboard.Modifiers == ModifierKeys.Control &&
                 e.Key == Key.S)
             {
-                App.Current.Dispatcher.Invoke(new Action(() =>
+                Task.Run(() =>
                 {
                     if (FilePath != string.Empty)
                     {
                         using (var sw = new StreamWriter(FilePath))
                         {
-                            sw.Write(Page.Text);
+                            sw.Write(FileContent);
                         }
                     }
                     else
@@ -68,7 +84,7 @@ namespace Compiler
                             File.Create(fileDialog.FileName);
                         }
                     }
-                }));                
+                });                
             }
         }
     }

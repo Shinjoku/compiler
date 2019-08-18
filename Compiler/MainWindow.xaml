@@ -55,7 +55,7 @@
     </Window.Triggers>
     
     <Grid Loaded="SelectFile">
-        <Grid Height="70" VerticalAlignment="Top" Background="Gray">
+        <Grid Height="70" VerticalAlignment="Top" Background="Gray" MouseLeftButtonDown="grdTopBar_MouseDown">
             <TextBlock Text="Compiler" VerticalAlignment="Center"
                        HorizontalAlignment="Center" FontSize="22"
                        Foreground="White"/>
@@ -73,7 +73,7 @@
                 </materialDesign:PopupBox>
             </StackPanel>
         </Grid>
-        <Grid x:Name="GridMenu" Width="60" 
+        <Grid x:Name="GridMenu" Width="60" Panel.ZIndex="1"
             HorizontalAlignment="Left" Background="DimGray">
             <StackPanel>
                 <Grid Height="70" Background="White">
@@ -117,13 +117,13 @@
                                            Margin="20 10"/>
                         </StackPanel>
                     </ListViewItem>
-                    <ListViewItem>
+                    <ListViewItem Name="lviRunCompiler" PreviewMouseLeftButtonDown="lviRunCompiler_Click">
                         <StackPanel Orientation="Horizontal">
                             <materialDesign:PackIcon Kind="Play"
                                                      Width="25" Height="25"
                                                      Margin="10"/>
                             <TextBlock Text="Run Compiler"
-                                           Margin="20 10"/>
+                                       Margin="20 10"/>
                         </StackPanel>
                     </ListViewItem>
                 </ListView>
@@ -131,20 +131,23 @@
         </Grid>
 
         <Grid Margin="80 90 20 20">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="4*"/>
-                <RowDefinition Height="4*"/>
-                <RowDefinition Height="4*"/>
-            </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="7*"/>
-                <ColumnDefinition Width="7*"/>
-                <ColumnDefinition Width="7*"/>
-                <ColumnDefinition Width="7*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <local:TextEditor Grid.Column="2" Grid.Row="0" Grid.ColumnSpan="2" Grid.RowSpan="3" 
-                              x:Name="TxtEditor" Background="LightGray"/>
+            <Grid Grid.Column="0" Grid.Row="0" Margin="0 0 10 0">
+                
+                <TextBlock Grid.ColumnSpan="2" Name="txtAlert" Panel.ZIndex="0"
+                    Text="{Binding Path=AlertMsg, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                    Background="DimGray" Foreground="Red" Height="55" FontSize="18"
+                    VerticalAlignment="Top" TextWrapping="Wrap"/>
+            </Grid>
+
+            <Grid Grid.Column="1" Margin="10 0 0 0">
+                <local:TextEditor Grid.Column="0"
+                                  x:Name="TxtEditor"/>
+            </Grid>
         </Grid>
 
 

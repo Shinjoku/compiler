@@ -7,7 +7,7 @@ namespace Compiler.Environment
     /// <summary>
     /// Runtime environment that execute all given instructions.
     /// </summary>
-    class VirtualMachine
+    public static class VirtualMachine
     {
         public static bool Run(List<Instruction> instructions)
         {
@@ -142,6 +142,7 @@ namespace Compiler.Environment
                 catch (Exception e)
                 {
                     Console.WriteLine("Line " + instructions[PC].Id + ": " + e);
+                    break;
                 }
                 if (fin) break;
 
