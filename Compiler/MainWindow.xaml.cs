@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Media;
 
 namespace Compiler
 {
@@ -12,7 +13,11 @@ namespace Compiler
     /// </summary>
     public partial class MainWindow : Window, INotifyPropertyChanged
     {
-        private object _lock = new object();
+        #region Properties
+
+        private object _alertMsglock = new object();
+        private object _alertColorlock = new object();
+        private object _alertLock = new object();
 
         public event PropertyChangedEventHandler PropertyChanged;
         protected void OnPropertyChanged(string propertyName)
@@ -27,7 +32,7 @@ namespace Compiler
             set {
                 if(value != _alertMsg)
                 {
-                    lock(_lock)
+                    lock(_alertMsglock)
                     {
                         _alertMsg = value;
                         OnPropertyChanged("AlertMsg");
@@ -36,6 +41,27 @@ namespace Compiler
                 }
             }
         }
+
+        private SolidColorBrush _alertColor;
+        public SolidColorBrush AlertColor
+        {
+            get { return _alertColor; }
+            set
+            {
+                if (value != _alertColor)
+                {
+                    lock (_alertColorlock)
+                    {
+                        _alertColor = value;
+                        OnPropertyChanged("AlertColor");
+                    }
+
+                }
+            }
+        }
+
+        #endregion
+
         public MainWindow()
         {
             InitializeComponent();
@@ -43,13 +69,20 @@ namespace Compiler
             KeyDown += RunCompiler_Event;
         }
 
-        public void UpdateScreenAlert(string msg)
+        public void UpdateScreenAlert(string msg, bool isError)
         {
             Task.Run(() =>
             {
-                AlertMsg = msg;
-                Thread.Sleep(5000);
-                AlertMsg = "";
+                lock (_alertLock)
+                {
+                    AlertMsg = msg;
+
+                    if (isError) AlertColor = Brushes.Red;
+                    else AlertColor = Brushes.LightGreen;
+
+                    Thread.Sleep(5000);
+                    AlertMsg = "";
+                }
             });
         }
 
@@ -69,9 +102,9 @@ namespace Compiler
         {
             var ans = await Task.Run(() => VirtualMachine.Run(Instruction.ExtractInstructions(TxtEditor.FileContent)));
             if (ans)
-                UpdateScreenAlert("The Vm was closed sucessfully");
+                UpdateScreenAlert("The Vm was closed sucessfully", false);
             else
-                UpdateScreenAlert("The Vm could not run the commands. Check your spelling.");
+                UpdateScreenAlert("The Vm could not run the commands. Check your spelling.", true);
         }
 
         #region Events

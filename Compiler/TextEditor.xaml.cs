@@ -13,6 +13,8 @@ namespace Compiler
     /// </summary>
     public partial class TextEditor : UserControl, INotifyPropertyChanged
     {
+        #region Properties
+
         public string FilePath { get; set; }
         private string _fileContent;
         public string FileContent
@@ -33,6 +35,8 @@ namespace Compiler
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
+
+        #endregion
 
         public TextEditor()
         {
@@ -61,6 +65,8 @@ namespace Compiler
             return sb.ToString();
         }
 
+        #region Events
+
         private void SaveFile_KeyDown(object sender, KeyEventArgs e)
         {
             if(Keyboard.Modifiers == ModifierKeys.Control &&
@@ -87,5 +93,7 @@ namespace Compiler
                 });                
             }
         }
+
+        #endregion
     }
 }

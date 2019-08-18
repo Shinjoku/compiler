@@ -36,13 +36,17 @@
         <!--<Style x:Key="menuBtn" TargetType="Button">
             <Setter Property="Height" Value="60"/>
             <Setter Property="Width" Value="60"/>
-            <Setter Property="Width" Value="60"/>
             <Setter Property="Background" Value="{x:Null}"/>
             <Setter Property="BorderBrush" Value="{x:Null}"/>
             <Setter Property="VerticalAlignment" Value="center"/>
             <Setter Property="HorizontalAlignment" Value="Right"/>
             <Setter Property="Foreground" Value="Black"/>
         </Style>-->
+        <Style x:Key="SquareBorder" TargetType="Border">
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BorderBrush" Value="Gray"/>
+            <Setter Property="Margin" Value="10"/>
+        </Style>
     </Window.Resources>
 
     <Window.Triggers>
@@ -137,16 +141,98 @@
             </Grid.ColumnDefinitions>
 
             <Grid Grid.Column="0" Grid.Row="0" Margin="0 0 10 0">
+
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    
+                    <TextBlock Grid.Row="0" Name="txtAlert" Panel.ZIndex="0"
+                        Text="{Binding Path=AlertMsg, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                        Foreground="{Binding Path=AlertColor, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                        Background="DimGray" Height="55" FontSize="18"
+                        VerticalAlignment="Top" TextWrapping="Wrap" TextAlignment="Center"/>
+
+                    <Grid Grid.Row="1" Margin="0 20 0 0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <Border Grid.Column="0" Grid.Row="0" Style="{StaticResource SquareBorder}">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+                                <Label Grid.Row="0" Content="In" FontSize="20"
+                                    HorizontalAlignment="Center"/>
+                                <TextBox Grid.Row="1" AcceptsReturn="True"
+                                         BorderThickness="0" Background="LightGray"/>
+                            </Grid>
+                        </Border>
+
+                        <Border Grid.Column="1" Grid.Row="0" Style="{StaticResource SquareBorder}">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+                                
+                                <Label Grid.Row="0" Content="Out" FontSize="20"
+                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                <StackPanel Grid.Row="1" Orientation="Vertical" Background="LightGray">
+                                    <TextBlock/>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+
+                        <Border Grid.Column="0" Grid.Row="1" Style="{StaticResource SquareBorder}">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+                                
+                                <Label Grid.Row="0" Content="Breakpoints" FontSize="20"
+                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                
+                                <TextBox Grid.Row="1" BorderThickness="0" Background="LightGray"
+                                         AcceptsReturn="True"/>
+                            </Grid>
+                        </Border>
+                        
+                        <Border Grid.Column="1" Grid.Row="1" Style="{StaticResource SquareBorder}">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+                                
+                                <Label Grid.Row="0" Content="Stack" FontSize="20"
+                                    HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                <StackPanel Grid.Row="1" Orientation="Vertical"
+                                            Background="LightGray">
+                                    <TextBlock />
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+
+                    </Grid>
+                </Grid>
                 
-                <TextBlock Grid.ColumnSpan="2" Name="txtAlert" Panel.ZIndex="0"
-                    Text="{Binding Path=AlertMsg, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                    Background="DimGray" Foreground="Red" Height="55" FontSize="18"
-                    VerticalAlignment="Top" TextWrapping="Wrap"/>
             </Grid>
 
             <Grid Grid.Column="1" Margin="10 0 0 0">
-                <local:TextEditor Grid.Column="0"
-                                  x:Name="TxtEditor"/>
+                <Border BorderBrush="Gray" BorderThickness="1">
+                    <local:TextEditor Grid.Column="0"
+                                      x:Name="TxtEditor"/>
+                </Border>
             </Grid>
         </Grid>
 

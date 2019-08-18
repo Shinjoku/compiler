@@ -6,15 +6,16 @@
              xmlns:local="clr-namespace:Compiler"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <Grid Background="LightGray">
+    <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
+        
         <Label Grid.Row="0" Content="Text Editor" 
-                   FontSize="22" FontWeight="Bold" 
-                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
-        <TextBox Grid.Row="1" Padding="5"
+               FontSize="22" FontWeight="Bold" 
+               HorizontalAlignment="Center" VerticalAlignment="Center"/>
+        <TextBox Grid.Row="1" Padding="5" Background="LightGray"
                  Name="Page" AcceptsReturn="True" VerticalContentAlignment="Top"
                  Text="{Binding Path=FileContent, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                  FontSize="16"/>
