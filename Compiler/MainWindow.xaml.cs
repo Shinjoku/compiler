@@ -18,6 +18,8 @@ namespace Compiler
         private object _alertMsglock = new object();
         private object _alertColorlock = new object();
         private object _alertLock = new object();
+        private object _inTextLock = new object();
+        private object _outTextLock = new object();
 
         public event PropertyChangedEventHandler PropertyChanged;
         protected void OnPropertyChanged(string propertyName)
@@ -60,6 +62,42 @@ namespace Compiler
             }
         }
 
+        private string _outText;
+        public string OutText
+        {
+            get { return _outText; }
+            set
+            {
+                if (value != _outText)
+                {
+                    lock (_outTextLock)
+                    {
+                        _outText = value;
+                        OnPropertyChanged("OutText");
+                    }
+
+                }
+            }
+        }
+
+        private string _inText;
+        public string InText
+        {
+            get { return _inText; }
+            set
+            {
+                if (value != _inText)
+                {
+                    lock (_inTextLock)
+                    {
+                        _inText = value;
+                        OnPropertyChanged("InText");
+                    }
+
+                }
+            }
+        }
+
         #endregion
 
         public MainWindow()
@@ -80,7 +118,7 @@ namespace Compiler
                     if (isError) AlertColor = Brushes.Red;
                     else AlertColor = Brushes.LightGreen;
 
-                    Thread.Sleep(5000);
+                    Thread.Sleep(3000);
                     AlertMsg = "";
                 }
             });
@@ -100,7 +138,7 @@ namespace Compiler
 
         public async void RunCompiler()
         {
-            var ans = await Task.Run(() => VirtualMachine.Run(Instruction.ExtractInstructions(TxtEditor.FileContent)));
+            var ans = await Task.Run(() => Vm.Run(Instruction.ExtractInstructions(TxtEditor.FileContent)));
             if (ans)
                 UpdateScreenAlert("The Vm was closed sucessfully", false);
             else

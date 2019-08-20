@@ -77,6 +77,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Environment\VirtualMachine.xaml.cs">
+      <DependentUpon>VirtualMachine.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Model\Instruction.cs" />
     <Compile Include="Line.xaml.cs">
       <DependentUpon>Line.xaml</DependentUpon>
@@ -87,7 +90,10 @@
       <DependentUpon>TextEditor.xaml</DependentUpon>
     </Compile>
     <Compile Include="Environment\Memory.cs" />
-    <Compile Include="Environment\VirtualMachine.cs" />
+    <Page Include="Environment\VirtualMachine.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="FileSelection.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

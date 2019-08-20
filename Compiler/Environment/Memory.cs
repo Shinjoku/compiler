@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 
 namespace Compiler.Environment
@@ -45,7 +44,7 @@ namespace Compiler.Environment
             DataStack[StackPointer - 1] = 
                 DataStack[StackPointer - 1] + DataStack[StackPointer];
 
-            DataStack.Remove(StackPointer);
+            DataStack.RemoveAt(StackPointer);
             StackPointer--;
         }
 
@@ -55,7 +54,7 @@ namespace Compiler.Environment
             DataStack[StackPointer - 1] = 
                 DataStack[StackPointer - 1] - DataStack[StackPointer];
 
-            DataStack.Remove(StackPointer);
+            DataStack.RemoveAt(StackPointer);
             StackPointer--;
         }
 
@@ -65,7 +64,7 @@ namespace Compiler.Environment
             DataStack[StackPointer - 1] = 
                 DataStack[StackPointer - 1] * DataStack[StackPointer];
 
-            DataStack.Remove(StackPointer);
+            DataStack.RemoveAt(StackPointer);
             StackPointer--;
         }
 
@@ -75,7 +74,7 @@ namespace Compiler.Environment
             DataStack[StackPointer - 1] =
                 DataStack[StackPointer - 1] / DataStack[StackPointer];
 
-            DataStack.Remove(StackPointer);
+            DataStack.RemoveAt(StackPointer);
             StackPointer--;
         }
 
@@ -93,7 +92,7 @@ namespace Compiler.Environment
             else
                 DataStack[StackPointer - 1] = 0;
 
-            DataStack.Remove(StackPointer);
+            DataStack.RemoveAt(StackPointer);
             StackPointer--;
         }
 
@@ -105,7 +104,7 @@ namespace Compiler.Environment
             else
                 DataStack[StackPointer - 1] = 0;
 
-            DataStack.Remove(StackPointer);
+            DataStack.RemoveAt(StackPointer);
             StackPointer--;
         }
 
@@ -123,7 +122,7 @@ namespace Compiler.Environment
             else
                 DataStack[StackPointer - 1] = 0;
 
-            DataStack.Remove(StackPointer);
+            DataStack.RemoveAt(StackPointer);
             StackPointer--;
         }
 
@@ -135,7 +134,7 @@ namespace Compiler.Environment
             else
                 DataStack[StackPointer - 1] = 0;
 
-            DataStack.Remove(StackPointer);
+            DataStack.RemoveAt(StackPointer);
             StackPointer--;
         }
 
@@ -147,7 +146,7 @@ namespace Compiler.Environment
             else
                 DataStack[StackPointer - 1] = 0;
 
-            DataStack.Remove(StackPointer);
+            DataStack.RemoveAt(StackPointer);
             StackPointer--;
         }
 
@@ -159,7 +158,7 @@ namespace Compiler.Environment
             else
                 DataStack[StackPointer - 1] = 0;
 
-            DataStack.Remove(StackPointer);
+            DataStack.RemoveAt(StackPointer);
             StackPointer--;
         }
 
@@ -171,7 +170,7 @@ namespace Compiler.Environment
             else
                 DataStack[StackPointer - 1] = 0;
 
-            DataStack.Remove(StackPointer);
+            DataStack.RemoveAt(StackPointer);
             StackPointer--;
         }
 
@@ -183,7 +182,7 @@ namespace Compiler.Environment
             else
                 DataStack[StackPointer - 1] = 0;
 
-            DataStack.Remove(StackPointer);
+            DataStack.RemoveAt(StackPointer);
             StackPointer--;
         }
 
@@ -191,20 +190,29 @@ namespace Compiler.Environment
         public void Store(int n)
         {
             DataStack[n] = DataStack[StackPointer];
-            DataStack.Remove(StackPointer);
+            DataStack.RemoveAt(StackPointer);
             StackPointer--;
         }
 
         // i = t
         public int Jump(int n)
         {
-            throw new NotImplementedException("Jump!");
+            return n;
         }
 
-        // se M[s] = 0 if i:=t, else i:=i + 1; s:=s-1 
+        // If M[s] = 0 then i:=t, else i:=i + 1; s:=s-1 
         public int JumpIfFalse(int n, int i)
         {
-            throw new NotImplementedException("Jump if false");
+            var currentValue = DataStack[StackPointer];
+            StackPointer--;
+            if (DataStack[StackPointer] == 0)
+            {
+                return n;
+            }
+            else
+            {
+                return i + 1;
+            }
         }
 
         // S:=s + 1; M[s]:= “next input value”. 	
@@ -218,7 +226,7 @@ namespace Compiler.Environment
         public int Print()
         {
             int currentValue = DataStack[StackPointer];
-            DataStack.Remove(StackPointer);
+            DataStack.RemoveAt(StackPointer);
             StackPointer--;
             return currentValue;
         }
@@ -229,10 +237,8 @@ namespace Compiler.Environment
             int k;
             for (k = 0; k <= (nI - 1); k++)
             {
-                DataStack.Add(0);
                 StackPointer++;
-                DataStack[StackPointer] = DataStack[mI + k];
-                DataStack[mI + k] = 0;
+                DataStack.Add(mI + k);
             }
         }
 
@@ -243,7 +249,7 @@ namespace Compiler.Environment
             for (k = (nI - 1); k >= 0; k--)
             {
                 DataStack[mI + k] = DataStack[StackPointer];
-                DataStack.Remove(StackPointer);
+                DataStack.RemoveAt(StackPointer);
                 StackPointer--;
             }
         }
@@ -251,14 +257,16 @@ namespace Compiler.Environment
         // S:=s + 1; M[s]:= i+ 1; i:=t 
         public int Call(int n, int i)
         {
-            throw new NotImplementedException();
+            StackPointer++;
+            DataStack[StackPointer] = i + 1;
+            return n;
         }
 
         // i:=M[s]; s:=s - 1 
         public int Return()
         {
             int currentValue = DataStack[StackPointer];
-            DataStack.Remove(StackPointer);
+            DataStack.RemoveAt(StackPointer);
             StackPointer--;
             return currentValue;
         }
