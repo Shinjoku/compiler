@@ -15,7 +15,7 @@
         FontFamily="{DynamicResource MaterialDesignFont}"
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
         WindowStartupLocation="CenterScreen"
-        WindowStyle="None" Topmost="True"
+        WindowStyle="None"
         Title="MainWindow" 
         Height="750" Width="1080" MinHeight="500" MinWidth="860">
     <Window.Resources>

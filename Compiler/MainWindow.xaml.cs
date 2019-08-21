@@ -113,8 +113,12 @@ namespace Compiler
                     try
                     {
                         return Vm.Run(Instruction.ExtractInstructions(TxtEditor.FileContent));
-                    } catch(Exception e) { throw new Exception(e.Message); }
+                    } catch(Exception e) {
+                        UpdateScreenAlert("The Vm is not working.", true);
+                        return new Task<bool>(() => false);
+                    }
                 });
+
                 if (ans)
                     UpdateScreenAlert("The Vm was closed sucessfully", false);
             }
