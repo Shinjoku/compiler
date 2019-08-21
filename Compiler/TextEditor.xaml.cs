@@ -1,33 +1,53 @@
-﻿using Compiler.Model;
-using System;
-using System.ComponentModel;
-using System.IO;
+﻿using System.IO;
 using System.Text;
 using System.Windows.Controls;
-using System.Windows.Documents;
 using System.Windows.Input;
 using Microsoft.Win32;
-
+using System.Threading.Tasks;
+using System.ComponentModel;
+using System;
 
 namespace Compiler
 {
     /// <summary>
     /// Interação lógica para TextEditor.xaml
     /// </summary>
-    public partial class TextEditor : UserControl
+    public partial class TextEditor : UserControl, INotifyPropertyChanged
     {
-        public string FilePath;
-        public string FileContent;
+        #region Properties
+        public event Action<string> UpdateAlert;
+        public string FilePath { get; set; }
+        private string _fileContent;
+        public string FileContent
+        {
+            get { return _fileContent; }
+            set
+            {
+                if (value != _fileContent)
+                {
+                    _fileContent = value;
+                    OnPropertyChanged("FileContent");
+                }
+            }
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected void OnPropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        #endregion
 
         public TextEditor()
         {
             InitializeComponent();
-            KeyDown += new KeyEventHandler(SaveFile_KeyDown);
+            Page.DataContext = this;
         }
 
         public void UpdateFileContent()
         {
-            Page.Text = ReadFile();
+            FileContent = ReadFile();
         }
 
         public string ReadFile()
@@ -45,31 +65,35 @@ namespace Compiler
             return sb.ToString();
         }
 
-        private void SaveFile_KeyDown(object sender, KeyEventArgs e)
+        public void SaveFile()
         {
-            if(Keyboard.Modifiers == ModifierKeys.Control &&
-                e.Key == Key.S)
+            Task.Run(() =>
             {
-                App.Current.Dispatcher.Invoke(new Action(() =>
+                if (FilePath != string.Empty)
                 {
-                    if (FilePath != string.Empty)
+                    using (var sw = new StreamWriter(FilePath))
                     {
-                        using (var sw = new StreamWriter(FilePath))
-                        {
-                            sw.Write(Page.Text);
-                        }
+                        sw.Write(FileContent);
                     }
-                    else
+
+                    UpdateAlert("The file has been saved successfully.");
+                }
+                else
+                {
+                    var fileDialog = new OpenFileDialog();
+                    bool? result = fileDialog.ShowDialog();
+                    if (result == true)
                     {
-                        var fileDialog = new OpenFileDialog();
-                        bool? result = fileDialog.ShowDialog();
-                        if (result == true)
-                        {
-                            File.Create(fileDialog.FileName);
-                        }
+                        File.Create(fileDialog.FileName);
                     }
-                }));                
-            }
+
+                    UpdateAlert("The file has been created successfully.");
+                }
+            });
         }
+
+        #region Events
+
+        #endregion
     }
 }
