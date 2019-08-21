@@ -15,8 +15,9 @@
         FontFamily="{DynamicResource MaterialDesignFont}"
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
         WindowStartupLocation="CenterScreen"
-        WindowStyle="None"
-        Title="MainWindow" Height="750" Width="1080">
+        WindowStyle="None" Topmost="True"
+        Title="MainWindow" 
+        Height="750" Width="1080" MinHeight="500" MinWidth="860">
     <Window.Resources>
         <Storyboard x:Key="MenuOpen">
             <DoubleAnimationUsingKeyFrames 
@@ -53,8 +54,8 @@
             <BeginStoryboard Storyboard="{StaticResource MenuClose}"/>
         </EventTrigger>
     </Window.Triggers>
-    
-    <Grid Loaded="SelectFile">
+
+    <Grid Loaded="grdSelectFile_Loaded">
         <Grid Height="70" VerticalAlignment="Top" Background="Gray" MouseLeftButtonDown="grdTopBar_MouseDown">
             <TextBlock Text="Compiler" VerticalAlignment="Center"
                        HorizontalAlignment="Center" FontSize="22"
@@ -99,7 +100,7 @@
                 <ListView Foreground="White" VerticalAlignment="Center"
                           VerticalContentAlignment="Center"
                           ScrollViewer.HorizontalScrollBarVisibility="Disabled">
-                    <ListViewItem>
+                    <ListViewItem PreviewMouseLeftButtonDown="lviSelectFile_Click">
                         <StackPanel Orientation="Horizontal">
                             <materialDesign:PackIcon Kind="File"
                                                      Width="25" Height="25"
@@ -108,7 +109,7 @@
                                            Margin="20 10"/>
                         </StackPanel>
                     </ListViewItem>
-                    <ListViewItem>
+                    <ListViewItem PreviewMouseLeftButtonDown="lviSaveFile_Click">
                         <StackPanel Orientation="Horizontal">
                             <materialDesign:PackIcon Kind="ContentSave"
                                                      Width="25" Height="25"
@@ -144,10 +145,10 @@
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
                     
-                    <TextBlock Grid.Row="0" Name="txtAlert" Panel.ZIndex="0"
+                    <TextBlock Grid.Row="0" Name="txtAlert" Panel.ZIndex="0" Padding="10"
                         Text="{Binding Path=AlertMsg, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                         Foreground="{Binding Path=AlertColor, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                        Background="DimGray" Height="55" FontSize="18"
+                        Background="DimGray" Height="65" FontSize="18"
                         VerticalAlignment="Top" TextWrapping="Wrap" TextAlignment="Center"/>
 
                     <env:VirtualMachine Grid.Row="1" x:Name="Vm"/>

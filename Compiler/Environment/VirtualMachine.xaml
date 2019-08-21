@@ -31,8 +31,9 @@
                 </Grid.RowDefinitions>
                 <Label Grid.Row="0" Content="In" FontSize="20"
                                     HorizontalAlignment="Center"/>
-                <TextBox Grid.Row="1" AcceptsReturn="True" Name="In"
-                         BorderThickness="0" Background="LightGray"/>
+                <TextBlock Grid.Row="1" Name="In" FontSize="20"
+                         Text="{Binding Path=InputText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                         Background="LightGray" TextAlignment="Center"/>
             </Grid>
         </Border>
 
@@ -45,9 +46,9 @@
 
                 <Label Grid.Row="0" Content="Out" FontSize="20"
                                        HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                <StackPanel Grid.Row="1" Orientation="Vertical" Background="LightGray">
-                    <TextBlock/>
-                </StackPanel>
+                <TextBlock Grid.Row="1" Background="LightGray"
+                           FontSize="20" TextAlignment="Center"
+                    Text="{Binding Path=OutputText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
             </Grid>
         </Border>
 
@@ -62,7 +63,7 @@
                                        HorizontalAlignment="Center" VerticalAlignment="Center"/>
 
                 <TextBox Grid.Row="1" BorderThickness="0" Background="LightGray"
-                                         AcceptsReturn="True"/>
+                                         AcceptsReturn="True" FontSize="20"/>
             </Grid>
         </Border>
 
@@ -77,7 +78,7 @@
                        HorizontalAlignment="Center" VerticalAlignment="Center"/>
                 <StackPanel Grid.Row="1" Orientation="Vertical"
                             Background="LightGray">
-                    <TextBlock />
+                    <TextBlock FontSize="20" />
                 </StackPanel>
             </Grid>
         </Border>

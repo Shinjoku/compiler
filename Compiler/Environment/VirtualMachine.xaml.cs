@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -18,20 +19,76 @@ namespace Compiler.Environment
     /// <summary>
     /// Runtime environment that execute all given instructions.
     /// </summary>
-    public partial class VirtualMachine : UserControl
+    public partial class VirtualMachine : UserControl, INotifyPropertyChanged
     {
+        private object _inTextLock = new object();
+        private object _outTextLock = new object();
+
+        #region Properties
+
         public Memory Memory { get; set; }
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected void OnPropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        private string _inputText;
+        public string InputText
+        {
+            get { return _inputText; }
+            set
+            {
+                if (value != _inputText)
+                {
+                    lock (_inTextLock)
+                    {
+                        _inputText = value;
+                        OnPropertyChanged("InputText");
+                    }
+
+                }
+            }
+        }
+
+        private string _outputText;
+        public string OutputText
+        {
+            get { return _outputText; }
+            set
+            {
+                if (value != _outputText)
+                {
+                    lock (_outTextLock)
+                    {
+                        _outputText = value;
+                        OnPropertyChanged("OutputText");
+                    }
+
+                }
+            }
+        }
+
+        #endregion
 
         public VirtualMachine()
         {
             InitializeComponent();
+            DataContext = this;
             Memory = new Memory();
+        }
+
+        private void Clear()
+        {
+            InputText = OutputText = string.Empty;
+            Memory.ClearMemory();
         }
 
         public async Task<bool> Run(List<Instruction> instructions)
         {
             int PC = 0;
             bool fin = false;
+            Clear();
 
             while (PC < instructions.Count)
             {
@@ -150,12 +207,35 @@ namespace Compiler.Environment
                             break;
 
                         case "rd":
-                            Memory.Read(int.Parse(Console.ReadLine()));
-                            PC++;
+                            await App.Current.Dispatcher.BeginInvoke((Action) (() =>
+                            {
+                                UserInput userInput = new UserInput();
+                                userInput.SendInput += value =>
+                                {
+                                    InputText += value + "\n";
+                                    Memory.Read(int.Parse(value));
+                                };
+                                userInput.Owner = Application.Current.MainWindow;
+                                userInput.ShowDialog();
+
+                                PC++;
+                            }));
                             break;
 
                         case "prn":
-                            await Task.Run(() => In.Text += Memory.Print() + '\n');
+                            var printOk = await Task.Run(() =>
+                            {
+                                try
+                                {
+                                    OutputText += Memory.Print() + "\n";
+                                    return true;
+                                }
+                                catch (ArgumentOutOfRangeException e)
+                                {
+                                    return false;
+                                }
+                            });
+                            if (!printOk) throw new ArgumentOutOfRangeException();
                             PC++;
                             break;
 
@@ -179,20 +259,27 @@ namespace Compiler.Environment
                             PC = Memory.Return();
                             break;
 
-                        default: throw new WrongCommandException();
+                        default: throw new WrongCommandException("Unknown command has been found. Check your code.");
                     }
+                }
+                catch(ArgumentOutOfRangeException ArgE)
+                {
+                    throw new Exception("You should take a look at your indexes!");
                 }
                 catch (Exception e)
                 {
                     Console.WriteLine("Line " + instructions[PC].Id + ": " + e);
-                    break;
+                    throw new Exception("Unknown error has occured.");
                 }
                 if (fin) break;
             }
             if (fin) return true;
-            return false;
+            throw new SystemException("The machine wasn't closed successfully. Have you forgot the 'hlt' command?");
         }
 
     }
-    class WrongCommandException : Exception { };
+    public class WrongCommandException : Exception
+    {
+        public WrongCommandException(string msg) : base(msg) {}
+    };
 }

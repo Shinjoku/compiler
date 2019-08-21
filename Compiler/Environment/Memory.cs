@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 
 namespace Compiler.Environment
@@ -14,6 +15,12 @@ namespace Compiler.Environment
         public Memory()
         {
             DataStack = new List<int>();
+        }
+
+        public void ClearMemory()
+        {
+            DataStack = new List<int>();
+            StackPointer = 0;
         }
 
         #region Instructions
@@ -225,10 +232,18 @@ namespace Compiler.Environment
         //  “Print M[s]”; s:=s-1
         public int Print()
         {
-            int currentValue = DataStack[StackPointer];
-            DataStack.RemoveAt(StackPointer);
-            StackPointer--;
-            return currentValue;
+            try
+            {
+                int currentValue = DataStack[StackPointer];
+                DataStack.RemoveAt(StackPointer);
+                StackPointer--;
+                return currentValue;
+            }
+            catch(ArgumentOutOfRangeException e)
+            {
+                throw new ArgumentOutOfRangeException(e.Message);
+            }
+
         }
 
         // For k:=0 till n-1, do { s:=s + 1; M[s]:=M[m+k] } 

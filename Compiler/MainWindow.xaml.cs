@@ -1,8 +1,10 @@
 ﻿using Compiler.Environment;
+using System;
 using System.ComponentModel;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 
@@ -18,8 +20,7 @@ namespace Compiler
         private object _alertMsglock = new object();
         private object _alertColorlock = new object();
         private object _alertLock = new object();
-        private object _inTextLock = new object();
-        private object _outTextLock = new object();
+
 
         public event PropertyChangedEventHandler PropertyChanged;
         protected void OnPropertyChanged(string propertyName)
@@ -62,42 +63,6 @@ namespace Compiler
             }
         }
 
-        private string _outText;
-        public string OutText
-        {
-            get { return _outText; }
-            set
-            {
-                if (value != _outText)
-                {
-                    lock (_outTextLock)
-                    {
-                        _outText = value;
-                        OnPropertyChanged("OutText");
-                    }
-
-                }
-            }
-        }
-
-        private string _inText;
-        public string InText
-        {
-            get { return _inText; }
-            set
-            {
-                if (value != _inText)
-                {
-                    lock (_inTextLock)
-                    {
-                        _inText = value;
-                        OnPropertyChanged("InText");
-                    }
-
-                }
-            }
-        }
-
         #endregion
 
         public MainWindow()
@@ -105,6 +70,8 @@ namespace Compiler
             InitializeComponent();
             DataContext = this;
             KeyDown += RunCompiler_Event;
+            KeyDown += SaveFile_KeyDown;
+            TxtEditor.UpdateAlert += m => UpdateScreenAlert(m, false);
         }
 
         public void UpdateScreenAlert(string msg, bool isError)
@@ -124,7 +91,7 @@ namespace Compiler
             });
         }
 
-        public void SelectFile(object sender, RoutedEventArgs e)
+        public void SelectFile()
         {
             var fileSelection = new FileSelection();
             fileSelection.SendFilePath += val =>
@@ -132,17 +99,26 @@ namespace Compiler
                 txtFilePath.Text = val;
                 TxtEditor.FilePath = val;
                 TxtEditor.UpdateFileContent();
+                UpdateScreenAlert("File loaded.", false);
             };
-            fileSelection.Show();
+            fileSelection.Owner = Application.Current.MainWindow;
+            fileSelection.Show();                
         }
 
         public async void RunCompiler()
         {
-            var ans = await Task.Run(() => Vm.Run(Instruction.ExtractInstructions(TxtEditor.FileContent)));
-            if (ans)
-                UpdateScreenAlert("The Vm was closed sucessfully", false);
-            else
-                UpdateScreenAlert("The Vm could not run the commands. Check your spelling.", true);
+            try
+            {
+                var ans = await Task.Run(() => {
+                    try
+                    {
+                        return Vm.Run(Instruction.ExtractInstructions(TxtEditor.FileContent));
+                    } catch(Exception e) { throw new Exception(e.Message); }
+                });
+                if (ans)
+                    UpdateScreenAlert("The Vm was closed sucessfully", false);
+            }
+            catch(Exception e) { UpdateScreenAlert(e.Message, true); }
         }
 
         #region Events
@@ -169,17 +145,46 @@ namespace Compiler
             if (e.Key == Key.F5)
                 RunCompiler();
         }
+        private void SaveFile_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (Keyboard.Modifiers == ModifierKeys.Control &&
+                e.Key == Key.S)
+            {
+                TxtEditor.SaveFile();
+            }
+        }
 
         public void lviRunCompiler_Click(object sender, MouseEventArgs e)
         {
+            var button = (ListViewItem)sender;
+            button.IsEnabled = false;
+
             if (e.LeftButton == MouseButtonState.Pressed)
                 RunCompiler();
+
+            button.IsEnabled = true;
+        }
+        public void lviSelectFile_Click(object sender, MouseButtonEventArgs e)
+        {
+            if (e.LeftButton == MouseButtonState.Pressed)
+                SelectFile();
+        }
+
+        private void lviSaveFile_Click(object sender, MouseButtonEventArgs e)
+        {
+            if (e.LeftButton == MouseButtonState.Pressed)
+                TxtEditor.SaveFile();
         }
 
         private void grdTopBar_MouseDown(object sender, MouseButtonEventArgs e)
         {
             if (e.ChangedButton == MouseButton.Left)
                 DragMove();
+        }
+
+        private void grdSelectFile_Loaded(object sender, RoutedEventArgs e)
+        {
+            SelectFile();
         }
 
         #endregion

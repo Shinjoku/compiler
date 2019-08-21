@@ -5,6 +5,7 @@ using System.Windows.Input;
 using Microsoft.Win32;
 using System.Threading.Tasks;
 using System.ComponentModel;
+using System;
 
 namespace Compiler
 {
@@ -14,7 +15,7 @@ namespace Compiler
     public partial class TextEditor : UserControl, INotifyPropertyChanged
     {
         #region Properties
-
+        public event Action<string> UpdateAlert;
         public string FilePath { get; set; }
         private string _fileContent;
         public string FileContent
@@ -42,7 +43,6 @@ namespace Compiler
         {
             InitializeComponent();
             Page.DataContext = this;
-            KeyDown += new KeyEventHandler(SaveFile_KeyDown);
         }
 
         public void UpdateFileContent()
@@ -65,34 +65,34 @@ namespace Compiler
             return sb.ToString();
         }
 
-        #region Events
-
-        private void SaveFile_KeyDown(object sender, KeyEventArgs e)
+        public void SaveFile()
         {
-            if(Keyboard.Modifiers == ModifierKeys.Control &&
-                e.Key == Key.S)
+            Task.Run(() =>
             {
-                Task.Run(() =>
+                if (FilePath != string.Empty)
                 {
-                    if (FilePath != string.Empty)
+                    using (var sw = new StreamWriter(FilePath))
                     {
-                        using (var sw = new StreamWriter(FilePath))
-                        {
-                            sw.Write(FileContent);
-                        }
+                        sw.Write(FileContent);
                     }
-                    else
+
+                    UpdateAlert("The file has been saved successfully.");
+                }
+                else
+                {
+                    var fileDialog = new OpenFileDialog();
+                    bool? result = fileDialog.ShowDialog();
+                    if (result == true)
                     {
-                        var fileDialog = new OpenFileDialog();
-                        bool? result = fileDialog.ShowDialog();
-                        if (result == true)
-                        {
-                            File.Create(fileDialog.FileName);
-                        }
+                        File.Create(fileDialog.FileName);
                     }
-                });                
-            }
+
+                    UpdateAlert("The file has been created successfully.");
+                }
+            });
         }
+
+        #region Events
 
         #endregion
     }
