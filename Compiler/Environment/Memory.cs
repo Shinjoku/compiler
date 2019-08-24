@@ -240,7 +240,7 @@ namespace Compiler.Environment
         {
             var currentValue = DataStack[StackPointer];
             StackPointer--;
-            if (DataStack[StackPointer] == 0)
+            if (currentValue == 0)
             {
                 return n;
             }
@@ -255,23 +255,16 @@ namespace Compiler.Environment
         {
             DataStack.Add(value);
             StackPointer++;
+            DataStack[StackPointer] = value;
         }
 
         //  “Print M[s]”; s:=s-1
         public int Print()
         {
-            try
-            {
-                int currentValue = DataStack[StackPointer];
-                DataStack.RemoveAt(StackPointer);
-                StackPointer--;
-                return currentValue;
-            }
-            catch(ArgumentOutOfRangeException e)
-            {
-                throw new ArgumentOutOfRangeException(e.Message);
-            }
-
+            int currentValue = DataStack[StackPointer];
+            DataStack.RemoveAt(StackPointer);
+            StackPointer--;
+            return currentValue;
         }
 
         // For k:=0 till n-1, do { s:=s + 1; M[s]:=M[m+k] } 
@@ -280,8 +273,9 @@ namespace Compiler.Environment
             int k;
             for (k = 0; k <= (nI - 1); k++)
             {
-                StackPointer++;
                 DataStack.Add(mI + k);
+                StackPointer++;
+                DataStack[StackPointer] = DataStack[mI + k];
             }
         }
 
@@ -301,6 +295,7 @@ namespace Compiler.Environment
         public int Call(int n, int i)
         {
             StackPointer++;
+            DataStack.Add(0);
             DataStack[StackPointer] = i + 1;
             return n;
         }
