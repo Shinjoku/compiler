@@ -230,7 +230,7 @@ namespace Compiler.Environment
                                     OutputText += Memory.Print() + "\n";
                                     return true;
                                 }
-                                catch (ArgumentOutOfRangeException e)
+                                catch (ArgumentOutOfRangeException)
                                 {
                                     return false;
                                 }
@@ -262,7 +262,7 @@ namespace Compiler.Environment
                         default: throw new WrongCommandException("Unknown command has been found. Check your code.");
                     }
                 }
-                catch(ArgumentOutOfRangeException ArgE)
+                catch(ArgumentOutOfRangeException)
                 {
                     throw new Exception("You should take a look at your indexes!");
                 }

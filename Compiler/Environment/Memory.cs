@@ -1,15 +1,43 @@
 ﻿using System;
 using System.Collections.Generic;
-
+using System.ComponentModel;
 
 namespace Compiler.Environment
 {
     /// <summary>
     /// Contains instructions and methods to manipulate the Memory Stack
     /// </summary>
-    public class Memory
+    public class Memory : INotifyPropertyChanged
     {
-        public List<int> DataStack { get; set; }
+        #region Properties
+
+        public object _dataStackLock = new object();
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected void OnPropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        public List<int> _dataStack;
+        public List<int> DataStack {
+            get { return _dataStack; }
+            set
+            {
+                if (value != _dataStack)
+                {
+                    lock (_dataStackLock)
+                    {
+                        _dataStack = value;
+                        OnPropertyChanged("DataStack");
+                    }
+
+                }
+            }
+        }
+
+        #endregion
+
         public int StackPointer { get; set; }
 
         public Memory()

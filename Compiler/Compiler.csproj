@@ -94,6 +94,7 @@
     <Compile Include="UserInput.xaml.cs">
       <DependentUpon>UserInput.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Utils\ListToStringConverter.cs" />
     <Page Include="Environment\VirtualMachine.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

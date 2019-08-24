@@ -22,7 +22,7 @@ namespace Compiler
         {
             var fileDialog = new OpenFileDialog
             {
-                Filter = "Text documents (.txt)|*.txt"
+                Filter = "Assembly files (.obj)|*.obj"
             };
 
             bool? result = fileDialog.ShowDialog();
