@@ -102,7 +102,7 @@ namespace Compiler
                 UpdateScreenAlert("File loaded.", false);
             };
             fileSelection.Owner = Application.Current.MainWindow;
-            fileSelection.Show();                
+            fileSelection.ShowDialog();                
         }
 
         public async void RunCompiler()
