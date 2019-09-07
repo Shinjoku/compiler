@@ -56,17 +56,20 @@
     </Window.Triggers>
 
     <Grid Loaded="grdSelectFile_Loaded">
-        <Grid Height="70" VerticalAlignment="Top" Background="Gray" MouseLeftButtonDown="grdTopBar_MouseDown">
+        <Grid Height="70" VerticalAlignment="Top" 
+              Background="{Binding Path=Theme, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+              MouseLeftButtonDown="grdTopBar_MouseDown">
             <TextBlock Text="Compiler" VerticalAlignment="Center"
                        HorizontalAlignment="Center" FontSize="22"
                        Foreground="White"/>
             <StackPanel VerticalAlignment="Center" 
                         Orientation="Horizontal" 
                         HorizontalAlignment="Right">
+                
                 <TextBlock Name="txtFilePath" VerticalAlignment="Center" FontSize="18"/>
                 <materialDesign:PopupBox Margin="10"
                                          PlacementMode="BottomAndAlignRightEdges"
-                                         StaysOpen="False">
+                                         StaysOpen="False" Foreground="White">
                     <StackPanel Width="150">
                         <Button Content="Settings"/>
                         <Button Content="Close" Click="btnClose_Click"/>
@@ -75,7 +78,7 @@
             </StackPanel>
         </Grid>
         <Grid x:Name="GridMenu" Width="60" Panel.ZIndex="1"
-            HorizontalAlignment="Left" Background="DimGray">
+            HorizontalAlignment="Left" Background="{Binding Path=Theme, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
             <StackPanel>
                 <Grid Height="70" Background="White">
                     <Button Name="btnCloseMenu" Height="60" Width="60"
@@ -127,6 +130,15 @@
                                        Margin="20 10"/>
                         </StackPanel>
                     </ListViewItem>
+                    <ListViewItem Name="lviChangeIDEMode" PreviewMouseLeftButtonDown="lviChangeIDEMode_Click">
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon Kind="Switch"
+                                                     Width="25" Height="25"
+                                                     Margin="10"/>
+                            <TextBlock Text="Alternate VM/Compiler"
+                                       Margin="20 10"/>
+                        </StackPanel>
+                    </ListViewItem>
                 </ListView>
             </StackPanel>
         </Grid>
@@ -145,10 +157,10 @@
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
                     
-                    <TextBlock Grid.Row="0" Name="txtAlert" Panel.ZIndex="0" Padding="10"
+                    <TextBlock Padding="10" Grid.Row="0" Name="txtAlert" Panel.ZIndex="0" Height="65" FontSize="24"
                         Text="{Binding Path=AlertMsg, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                         Foreground="{Binding Path=AlertColor, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                        Background="DimGray" Height="65" FontSize="18"
+                        Background="{Binding Path=Theme, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
                         VerticalAlignment="Top" TextWrapping="Wrap" TextAlignment="Center"/>
 
                     <env:VirtualMachine Grid.Row="1" x:Name="Vm"/>

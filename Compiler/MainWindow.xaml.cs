@@ -20,6 +20,7 @@ namespace Compiler
         private object _alertMsglock = new object();
         private object _alertColorlock = new object();
         private object _alertLock = new object();
+        private object _themeLock = new object();
 
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -63,7 +64,27 @@ namespace Compiler
             }
         }
 
+        private Brush _theme = Brushes.Teal;
+        public Brush Theme
+        {
+            get { return _theme; }
+            set
+            {
+                if (value != _theme)
+                {
+                    lock (_themeLock)
+                    {
+                        _theme = value;
+                        OnPropertyChanged("Theme");
+                    }
+
+                }
+            }
+        }
+
         #endregion
+
+        public bool _compilerMode = true;
 
         public MainWindow()
         {
@@ -91,9 +112,30 @@ namespace Compiler
             });
         }
 
+        public void ChangeMode()
+        {
+            _compilerMode = !_compilerMode;
+
+            if (_compilerMode)
+            {
+                Theme = Brushes.Teal;
+                UpdateScreenAlert("Compiler mode activated.", false);
+            }
+            else
+            {
+                Theme = Brushes.DarkRed;
+                UpdateScreenAlert("VM mode activated.", false);
+            }
+        }
+
         public void SelectFile()
         {
-            var fileSelection = new FileSelection();
+            var fileSelection = new FileSelection
+            {
+                Owner = Application.Current.MainWindow,
+                CompilerMode = _compilerMode
+            };
+
             fileSelection.SendFilePath += val =>
             {
                 txtFilePath.Text = val;
@@ -101,26 +143,41 @@ namespace Compiler
                 TxtEditor.UpdateFileContent();
                 UpdateScreenAlert("File loaded.", false);
             };
-            fileSelection.Owner = Application.Current.MainWindow;
+
             fileSelection.ShowDialog();                
+        }
+
+        public async void RunVM()
+        {
+            var ans = await Task.Run(() => {
+                try
+                {
+                    return Vm.Run(Instruction.ExtractInstructions(TxtEditor.FileContent));
+                }
+                catch (Exception)
+                {
+                    UpdateScreenAlert("The Vm has stopped working.", true);
+                    return new Task<bool>(() => false);
+                }
+            });
+
+            if (ans)
+                UpdateScreenAlert("The Vm was closed sucessfully", false);
         }
 
         public async void RunCompiler()
         {
+            throw new NotImplementedException();
+        }
+
+        public void Run()
+        {
             try
             {
-                var ans = await Task.Run(() => {
-                    try
-                    {
-                        return Vm.Run(Instruction.ExtractInstructions(TxtEditor.FileContent));
-                    } catch(Exception e) {
-                        UpdateScreenAlert("The Vm has stopped working.", true);
-                        return new Task<bool>(() => false);
-                    }
-                });
-
-                if (ans)
-                    UpdateScreenAlert("The Vm was closed sucessfully", false);
+                if (_compilerMode)
+                    RunCompiler();
+                else
+                    RunVM();
             }
             catch(Exception e) { UpdateScreenAlert(e.Message, true); }
         }
@@ -147,7 +204,7 @@ namespace Compiler
         public void RunCompiler_Event(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.F5)
-                RunCompiler();
+                Run();
         }
         private void SaveFile_KeyDown(object sender, KeyEventArgs e)
         {
@@ -164,7 +221,7 @@ namespace Compiler
             button.IsEnabled = false;
 
             if (e.LeftButton == MouseButtonState.Pressed)
-                RunCompiler();
+                Run();
 
             button.IsEnabled = true;
         }
@@ -178,6 +235,12 @@ namespace Compiler
         {
             if (e.LeftButton == MouseButtonState.Pressed)
                 TxtEditor.SaveFile();
+        }
+
+        private void lviChangeIDEMode_Click(object sender, MouseButtonEventArgs e)
+        {
+            if (e.LeftButton == MouseButtonState.Pressed)
+                ChangeMode();
         }
 
         private void grdTopBar_MouseDown(object sender, MouseButtonEventArgs e)
