@@ -152,7 +152,8 @@ namespace Compiler
             var ans = await Task.Run(() => {
                 try
                 {
-                    return Vm.Run(Instruction.ExtractInstructions(TxtEditor.FileContent));
+                    return Vm.Run(
+                        AssemblyInstruction.ExtractAssemblyInstructions(TxtEditor.FileContent));
                 }
                 catch (Exception)
                 {

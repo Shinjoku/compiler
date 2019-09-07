@@ -24,14 +24,14 @@
                 Storyboard.TargetProperty="(FrameworkElement.Width)"
                 Storyboard.TargetName="GridMenu">
                 <EasingDoubleKeyFrame KeyTime="0" Value="60"/>
-                <EasingDoubleKeyFrame KeyTime="0:0:0.25" Value="200"/>
+                <EasingDoubleKeyFrame KeyTime="0:0:0.25" Value="250"/>
             </DoubleAnimationUsingKeyFrames>
         </Storyboard>
         <Storyboard x:Key="MenuClose">
             <DoubleAnimationUsingKeyFrames 
                 Storyboard.TargetProperty="(FrameworkElement.Width)"
                 Storyboard.TargetName="GridMenu">
-                <EasingDoubleKeyFrame KeyTime="0" Value="200"/>
+                <EasingDoubleKeyFrame KeyTime="0" Value="250"/>
                 <EasingDoubleKeyFrame KeyTime="0:0:0.25" Value="60"/>
             </DoubleAnimationUsingKeyFrames>
         </Storyboard>
@@ -78,7 +78,8 @@
             </StackPanel>
         </Grid>
         <Grid x:Name="GridMenu" Width="60" Panel.ZIndex="1"
-            HorizontalAlignment="Left" Background="{Binding Path=Theme, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+              HorizontalAlignment="Left" 
+              Background="{Binding Path=Theme, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
             <StackPanel>
                 <Grid Height="70" Background="White">
                     <Button Name="btnCloseMenu" Height="60" Width="60"
@@ -108,8 +109,9 @@
                             <materialDesign:PackIcon Kind="File"
                                                      Width="25" Height="25"
                                                      Margin="10"/>
-                            <TextBlock Text="Open File..."
-                                           Margin="20 10"/>
+                            <Viewbox Margin="20 10">
+                                <TextBlock Text="Open File..."/>
+                            </Viewbox>
                         </StackPanel>
                     </ListViewItem>
                     <ListViewItem PreviewMouseLeftButtonDown="lviSaveFile_Click">
@@ -117,8 +119,9 @@
                             <materialDesign:PackIcon Kind="ContentSave"
                                                      Width="25" Height="25"
                                                      Margin="10"/>
-                            <TextBlock Text="Save File"
-                                           Margin="20 10"/>
+                            <Viewbox Margin="20 10">
+                                <TextBlock Text="Save File"/>
+                            </Viewbox>
                         </StackPanel>
                     </ListViewItem>
                     <ListViewItem Name="lviRunCompiler" PreviewMouseLeftButtonDown="lviRunCompiler_Click">
@@ -126,8 +129,9 @@
                             <materialDesign:PackIcon Kind="Play"
                                                      Width="25" Height="25"
                                                      Margin="10"/>
-                            <TextBlock Text="Run Compiler"
-                                       Margin="20 10"/>
+                            <Viewbox Margin="20 10">
+                                <TextBlock Text="Run Compiler"/>
+                            </Viewbox>
                         </StackPanel>
                     </ListViewItem>
                     <ListViewItem Name="lviChangeIDEMode" PreviewMouseLeftButtonDown="lviChangeIDEMode_Click">
@@ -135,8 +139,9 @@
                             <materialDesign:PackIcon Kind="Switch"
                                                      Width="25" Height="25"
                                                      Margin="10"/>
-                            <TextBlock Text="Alternate VM/Compiler"
-                                       Margin="20 10"/>
+                            <Viewbox Margin="20 10">
+                                <TextBlock Text="Alternate VM/Compiler" TextWrapping="Wrap"/> 
+                            </Viewbox>
                         </StackPanel>
                     </ListViewItem>
                 </ListView>

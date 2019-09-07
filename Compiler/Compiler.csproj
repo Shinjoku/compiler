@@ -81,7 +81,7 @@
     <Compile Include="Environment\VirtualMachine.xaml.cs">
       <DependentUpon>VirtualMachine.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Model\Instruction.cs" />
+    <Compile Include="Model\AssemblyInstruction.cs" />
     <Compile Include="Line.xaml.cs">
       <DependentUpon>Line.xaml</DependentUpon>
     </Compile>

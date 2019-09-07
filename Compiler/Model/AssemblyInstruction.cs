@@ -4,9 +4,9 @@ using System.Collections.Generic;
 namespace Compiler.Environment
 {
     /// <summary>
-    /// Instructions base class.
+    /// Assembly Instructions base class.
     /// </summary>
-    public class Instruction
+    public class AssemblyInstruction
     {
         public static List<string> LabelInstructions = new List<string>
         {
@@ -19,7 +19,7 @@ namespace Compiler.Environment
         public string Name;
         public int[] Parameters;
     
-        public Instruction(int id, string name, int[] parameters)
+        public AssemblyInstruction(int id, string name, int[] parameters)
         {
             Id = id;
             Name = name;
@@ -32,13 +32,13 @@ namespace Compiler.Environment
             return currentLine.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
         }
 
-        public static List<Instruction> ExtractInstructions(string txt)
+        public static List<AssemblyInstruction> ExtractAssemblyInstructions(string txt)
         {
             int i = 0;
             int lineCounter = 0;
             string[] strParameters;
             var lines = txt.ToLower().Split('\n');
-            var result = new List<Instruction>();
+            var result = new List<AssemblyInstruction>();
             var labels = new Dictionary<string, string>();
 
             foreach(var readLine in lines)
@@ -77,7 +77,7 @@ namespace Compiler.Environment
                     }
                 }
 
-                result.Add(new Instruction(i, infos[0], parameters));
+                result.Add(new AssemblyInstruction(i, infos[0], parameters));
                 i++;
             }
 
