@@ -15,8 +15,8 @@
         <Label Grid.Row="0" Content="Text Editor" 
                FontSize="22" FontWeight="Bold" 
                HorizontalAlignment="Center" VerticalAlignment="Center"/>
-        <TextBox Grid.Row="1" Padding="5" Background="LightGray"
-                 Name="Page" AcceptsReturn="True" VerticalContentAlignment="Top"
+        <TextBox Grid.Row="1" Padding="5" Background="LightGray" AcceptsTab="True"
+                 Name="Page" AcceptsReturn="True" VerticalContentAlignment="Top" TabIndex="1"
                  Text="{Binding Path=FileContent, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                  FontSize="16"/>
     </Grid>
