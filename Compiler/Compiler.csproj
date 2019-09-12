@@ -82,13 +82,13 @@
       <DependentUpon>VirtualMachine.xaml</DependentUpon>
     </Compile>
     <Compile Include="General\Lexical.cs" />
-    <Compile Include="General\TokenGenerator.cs" />
     <Compile Include="Model\AssemblyInstruction.cs" />
     <Compile Include="Line.xaml.cs">
       <DependentUpon>Line.xaml</DependentUpon>
     </Compile>
     <Compile Include="Model\Code.cs" />
     <Compile Include="Model\LPDInstructions.cs" />
+    <Compile Include="Model\PointerPosition.cs" />
     <Compile Include="Model\Token.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TextEditor.xaml.cs">

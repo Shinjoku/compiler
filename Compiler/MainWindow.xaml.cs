@@ -1,4 +1,5 @@
 ﻿using Compiler.Environment;
+using Compiler.General;
 using System;
 using System.ComponentModel;
 using System.Threading;
@@ -85,6 +86,7 @@ namespace Compiler
         #endregion
 
         public bool _compilerMode = true;
+        private int _alertCounter = 0;
 
         public MainWindow()
         {
@@ -99,15 +101,18 @@ namespace Compiler
         {
             Task.Run(() =>
             {
+                _alertCounter++;
+                var alertString = _alertCounter + ": " + msg + '\n';
+                AlertMsg += alertString;
+
+                if (isError) AlertColor = Brushes.Red;
+                else AlertColor = Brushes.LightGreen;
+
                 lock (_alertLock)
                 {
-                    AlertMsg = msg;
-
-                    if (isError) AlertColor = Brushes.Red;
-                    else AlertColor = Brushes.LightGreen;
-
-                    Thread.Sleep(3000);
-                    AlertMsg = "";
+                    Thread.Sleep(2500);
+                    AlertMsg = AlertMsg.Replace(alertString, "");
+                    _alertCounter--;
                 }
             });
         }
@@ -168,7 +173,21 @@ namespace Compiler
 
         public async void RunCompiler()
         {
-            throw new NotImplementedException();
+            var ans = await Task.Run(() => {
+                try
+                {
+                    var lexical = new Lexical();
+                    return lexical.Run(TxtEditor.FilePath);
+                }
+                catch (Exception)
+                {
+                    UpdateScreenAlert("The compilation has failed.", true);
+                    return new Task<bool>(() => false);
+                }
+            });
+
+            if (ans)
+                UpdateScreenAlert("Your file has been compiled successfully.", false);
         }
 
         public void Run()

@@ -162,7 +162,7 @@
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
                     
-                    <TextBlock Padding="10" Grid.Row="0" Name="txtAlert" Panel.ZIndex="0" Height="65" FontSize="24"
+                    <TextBlock Padding="6" Grid.Row="0" Name="txtAlert" Panel.ZIndex="0" Height="125" FontSize="20"
                         Text="{Binding Path=AlertMsg, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                         Foreground="{Binding Path=AlertColor, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                         Background="{Binding Path=Theme, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
