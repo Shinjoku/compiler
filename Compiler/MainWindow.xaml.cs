@@ -8,6 +8,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 
 namespace Compiler
 {
@@ -124,11 +125,15 @@ namespace Compiler
             if (_compilerMode)
             {
                 Theme = Brushes.Teal;
+                Uri iconUri = new Uri("pack://application:,,,/Resources/Compiler.ico", UriKind.RelativeOrAbsolute);
+                Icon = BitmapFrame.Create(iconUri);
                 UpdateScreenAlert("Compiler mode activated.", false);
             }
             else
             {
                 Theme = Brushes.DarkRed;
+                Uri iconUri = new Uri("pack://application:,,,/Resources/VMRun.ico", UriKind.RelativeOrAbsolute);
+                Icon = BitmapFrame.Create(iconUri);
                 UpdateScreenAlert("VM mode activated.", false);
             }
         }

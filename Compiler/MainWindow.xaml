@@ -16,7 +16,7 @@
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
         WindowStartupLocation="CenterScreen"
         WindowStyle="None"
-        Title="MainWindow" 
+        Title="MainWindow" Icon="Resources/Compiler.ico"
         Height="750" Width="1080" MinHeight="500" MinWidth="860">
     <Window.Resources>
         <Storyboard x:Key="MenuOpen">

@@ -146,7 +146,7 @@ namespace Compiler.General
                 return HandleNumber();
 
             else if (char.IsLetter(_currentCharacter))
-                return HandleIdentifierAndReservedWord();
+                return HandleIdentifierAndKeyWord();
 
             else if (_currentCharacter == ':')
                 return HandleAttribution();
@@ -165,19 +165,34 @@ namespace Compiler.General
 
         private Token HandlePunctuation()
         {
-            Token result = new Token(0, null);
+            Token result;
+            string symbol = _currentCharacter.ToString();
 
             switch (_currentCharacter)
             {
                 case ';':
                     Console.WriteLine("Punctuation: {0}", _currentCharacter);
-                    result =  new Token((int)Token.LPDSymbol.DOT, _currentCharacter.ToString());
+                    result =  new Token((int)Token.LPDSymbol.DOT, symbol);
                     break;
 
                 case '.': 
                     Console.WriteLine("Punctuation: {0}", _currentCharacter);
-                    result = new Token((int)Token.LPDSymbol.DOT, _currentCharacter.ToString());
+                    result = new Token((int)Token.LPDSymbol.DOT, symbol);
                     break;
+
+                case '(':
+                    Console.WriteLine("Punctuation: {0}", _currentCharacter);
+                    result = new Token((int)Token.LPDSymbol.OPEN_PARENTHESIS, symbol);
+                    break;
+
+                case ')':
+                    Console.WriteLine("Punctuation: {0}", _currentCharacter);
+                    result = new Token((int)Token.LPDSymbol.CLOSE_PARENTHESIS, symbol);
+                    break;
+
+                default:
+                    Console.WriteLine("PUNCTUATION TOKEN CANNOT BE FOUND!");
+                    return null;
             }
 
             _currentCharacter = GetNextChar();
@@ -186,34 +201,143 @@ namespace Compiler.General
 
         private Token HandleRelationalOperators()
         {
-            throw new NotImplementedException();
+            string op = "" + _currentCharacter;
+            Token result;
+
+            switch (op)
+            {
+                case ">":
+                    _currentCharacter = GetNextChar();
+                    if (_currentCharacter == '=')
+                    {
+                        op += _currentCharacter;
+                        Console.WriteLine("Relational Operator: {0}", op);
+                        result = new Token((int)Token.LPDSymbol.GREATER_EQUAL, op);
+                    }
+                    else
+                    {
+                        Console.WriteLine("Relational Operator: {0}", op);
+                        result = new Token((int)Token.LPDSymbol.GREATER, op);
+                    }
+                    break;
+
+                case "<":
+                    _currentCharacter = GetNextChar();
+                    if (_currentCharacter == '=')
+                    {
+                        op += _currentCharacter;
+                        Console.WriteLine("Relational Operator: {0}", op);
+                        result = new Token((int)Token.LPDSymbol.LESSER_EQUAL, op);
+                    }
+                    else
+                    {
+                        Console.WriteLine("Relational Operator: {0}", op);
+                        result = new Token((int)Token.LPDSymbol.LESSER, op);
+                    }
+                    break;
+
+                case "=":
+                    Console.WriteLine("Relational Operator: {0}", op);
+                    result = new Token((int)Token.LPDSymbol.EQUAL, op);
+                    break;
+
+                case "!":
+                    _currentCharacter = GetNextChar();
+                    if (_currentCharacter == '=')
+                    {
+                        op += _currentCharacter;
+                        Console.WriteLine("Relational Operator: {0}", op);
+                        result = new Token((int)Token.LPDSymbol.DIFFERENT, op);
+                    }
+                    else throw new Exception();
+                    break;
+
+                default:
+                    Console.WriteLine("RELATIONAL TOKEN CANNOT BE FOUND!");
+                    return null;
+            }
+
+            _currentCharacter = GetNextChar();
+            return result;
         }
 
         private Token HandleArithmeticOperator()
         {
-            throw new NotImplementedException();
+            string op = _currentCharacter.ToString();
+            Token result;
+
+            switch (_currentCharacter)
+            {
+                case '+':
+                    _currentCharacter = GetNextChar();
+                    Console.WriteLine("Arithmetic Operator: {0}", op);
+                    result = new Token((int)Token.LPDSymbol.PLUS, op);
+                    break;
+
+                case '-':
+                    _currentCharacter = GetNextChar();
+                    Console.WriteLine("Arithmetic Operator: {0}", op);
+                    result = new Token((int)Token.LPDSymbol.MINUS, op);
+                    break;
+
+                case '*':
+                    _currentCharacter = GetNextChar();
+                    Console.WriteLine("Arithmetic Operator: {0}", op);
+                    result = new Token((int)Token.LPDSymbol.MULTIPLICATION, op);
+                    break;
+
+                default:
+                    Console.WriteLine("ARITHMETIC TOKEN CANNOT BE FOUND!");
+                    return null;
+            }
+
+            _currentCharacter = GetNextChar();
+            return result;
         }
 
         private Token HandleAttribution()
         {
-            throw new NotImplementedException();
+            string characters = "" + _currentCharacter;
+
+            _currentCharacter = GetNextChar();
+            if(_currentCharacter != '=')
+            {
+                Console.WriteLine("Attribution: {0}", characters);
+                return new Token((int)Token.LPDSymbol.COLON, characters);
+            }
+            else
+            {
+                characters += _currentCharacter;
+                Console.WriteLine("Attribution: {0}", characters);
+                return new Token((int)Token.LPDSymbol.ATTRIBUTION, characters);
+            }
         }
 
-        private Token HandleIdentifierAndReservedWord()
+        private Token HandleIdentifierAndKeyWord()
         {
-            var identifier = new StringBuilder();
+            var identifierSB = new StringBuilder();
 
-            identifier.Append(_currentCharacter);
+            identifierSB.Append(_currentCharacter);
             _currentCharacter = GetNextChar();
 
             while (char.IsLetter(_currentCharacter))
             {
-                identifier.Append(_currentCharacter);
+                identifierSB.Append(_currentCharacter);
                 _currentCharacter = GetNextChar();
             }
 
-            Console.WriteLine("Identifier: {0}", identifier.ToString());
-            return new Token((int)Token.LPDSymbol.IDENTIFIER, identifier.ToString());
+            var identifier = identifierSB.ToString();
+
+            if (Token.Keywords.ContainsKey(identifier))
+            {
+                Console.WriteLine("Keyword: {0}", identifier);
+                return new Token((int)Token.Keywords[identifier], identifier);
+            }
+            else
+            {
+                Console.WriteLine("Identifier: {0}", identifier);
+                return new Token((int)Token.LPDSymbol.IDENTIFIER, identifier);
+            }
         }
 
         private Token HandleNumber()
