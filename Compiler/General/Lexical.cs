@@ -10,10 +10,11 @@ namespace Compiler.General
     class Lexical
     {
         private StreamReader _file;
-        private PointerPosition _position;
         private List<Token> _tokens;
-        private bool _reachedEndOfFile;
         private char _currentCharacter;
+
+        public bool ReachedEndOfFile;
+        public PointerPosition Position;
 
         public Lexical()
         {
@@ -23,7 +24,7 @@ namespace Compiler.General
         private void OpenFile(string filePath)
         {
             _file = new StreamReader(filePath, Encoding.UTF8);
-            _position = new PointerPosition();
+            Position = new PointerPosition();
         }
 
         public char GetNextChar()
@@ -31,27 +32,27 @@ namespace Compiler.General
             try
             {
                 var result = (char)_file.Read();
-                _position.Column++;
+                Position.Column++;
 
                 if (result == '\n')
                 {
-                    _position.Column = 1;
-                    _position.Line++;
+                    Position.Column = 1;
+                    Position.Line++;
                 }
 
-                if(result == ushort.MaxValue) _reachedEndOfFile = true;
+                if(result == ushort.MaxValue) ReachedEndOfFile = true;
                 return result;
             }
             catch (IOException)
             {
-                _reachedEndOfFile = true;
+                ReachedEndOfFile = true;
                 return (char)0;
             }
         }
 
         private void PassComment()
         {
-            while (_currentCharacter != '}' && !_reachedEndOfFile)
+            while (_currentCharacter != '}' && !ReachedEndOfFile)
             {
                 _currentCharacter = GetNextChar();
             }
@@ -62,7 +63,7 @@ namespace Compiler.General
 
         private void PassSpace()
         {
-            while (LPD.SpaceCharacters.IsMatch(_currentCharacter.ToString()) && !_reachedEndOfFile)
+            while (LPD.SpaceCharacters.IsMatch(_currentCharacter.ToString()) && !ReachedEndOfFile)
             {
                 _currentCharacter = GetNextChar();
             }
@@ -85,10 +86,10 @@ namespace Compiler.General
                 OpenFile(filePath);
                 _currentCharacter = GetNextChar();
 
-                while (!_reachedEndOfFile)
+                while (!ReachedEndOfFile)
                 {
                     while((_currentCharacter == '{' || LPD.SpaceCharacters.IsMatch(_currentCharacter.ToString())) &&
-                        !_reachedEndOfFile)
+                        !ReachedEndOfFile)
                     {
                         if (_currentCharacter == '{')
                             PassComment();
@@ -96,7 +97,7 @@ namespace Compiler.General
                         PassSpace();
                     }
 
-                    if (!_reachedEndOfFile)
+                    if (!ReachedEndOfFile)
                         _tokens.Add(GetToken());
                 }
 
@@ -132,7 +133,7 @@ namespace Compiler.General
                 return HandlePunctuation();
 
             else throw new NotSupportedCharacterException(
-                "Not supported character on line " + _position.Line + ", at column " + _position.Column + ".");
+                "Not supported character on line " + Position.Line + ", at column " + Position.Column + ".");
         }
 
         private Token HandlePunctuation()

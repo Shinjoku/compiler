@@ -73,7 +73,6 @@ namespace Compiler.Model
             ["nao"] = Symbol.NOT
         };
 
-
         #region Characters Lists
 
         public static readonly Regex Letters = new Regex(@"[a-zA-Z_]");
