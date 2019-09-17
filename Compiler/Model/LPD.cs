@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 namespace Compiler.Model
 {
@@ -71,5 +72,17 @@ namespace Compiler.Model
             ["ou"] = Symbol.OR,
             ["nao"] = Symbol.NOT
         };
+
+
+        #region Characters Lists
+
+        public static readonly Regex Letters = new Regex(@"[a-zA-Z_]");
+        public static readonly Regex Digits = new Regex(@"[0-9]");
+        public static readonly Regex ArithmeticOperators = new Regex(@"[+\-*]");
+        public static readonly Regex RelationalOperators = new Regex(@"[<>=!]");
+        public static readonly Regex PunctuationCharacters = new Regex(@"[;,.()]");
+        public static readonly Regex SpaceCharacters = new Regex("[ \\t\\n\\r]");
+
+        #endregion
     }
 }

@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Compiler.General
@@ -15,17 +14,6 @@ namespace Compiler.General
         private List<Token> _tokens;
         private bool _reachedEndOfFile;
         private char _currentCharacter;
-
-        #region Characters Lists
-
-        private readonly Regex Letters = new Regex(@"[a-zA-Z_]");
-        private readonly Regex Digits = new Regex(@"[0-9]");
-        private readonly Regex ArithmeticOperators = new Regex(@"[+\-*]");
-        private readonly Regex RelationalOperators = new Regex(@"[<>=!]");
-        private readonly Regex PunctuationCharacters = new Regex(@"[;,.()]");
-        private readonly Regex SpaceCharacters = new Regex("[ \\t\\n\\r]");
-
-        #endregion
 
         public Lexical()
         {
@@ -74,7 +62,7 @@ namespace Compiler.General
 
         private void PassSpace()
         {
-            while (SpaceCharacters.IsMatch(_currentCharacter.ToString()) && !_reachedEndOfFile)
+            while (LPD.SpaceCharacters.IsMatch(_currentCharacter.ToString()) && !_reachedEndOfFile)
             {
                 _currentCharacter = GetNextChar();
             }
@@ -99,7 +87,7 @@ namespace Compiler.General
 
                 while (!_reachedEndOfFile)
                 {
-                    while((_currentCharacter == '{' || SpaceCharacters.IsMatch(_currentCharacter.ToString())) &&
+                    while((_currentCharacter == '{' || LPD.SpaceCharacters.IsMatch(_currentCharacter.ToString())) &&
                         !_reachedEndOfFile)
                     {
                         if (_currentCharacter == '{')
@@ -125,22 +113,22 @@ namespace Compiler.General
         {
             var currChar = _currentCharacter.ToString();
 
-            if (Digits.IsMatch(currChar))
+            if (LPD.Digits.IsMatch(currChar))
                 return HandleNumber();
 
-            else if (Letters.IsMatch(currChar))
+            else if (LPD.Letters.IsMatch(currChar))
                 return HandleIdentifierAndKeyWord();
 
             else if (_currentCharacter == ':')
                 return HandleAttribution();
 
-            else if (ArithmeticOperators.IsMatch(currChar))
+            else if (LPD.ArithmeticOperators.IsMatch(currChar))
                 return HandleArithmeticOperator();
 
-            else if (RelationalOperators.IsMatch(currChar))
+            else if (LPD.RelationalOperators.IsMatch(currChar))
                 return HandleRelationalOperators();
 
-            else if (PunctuationCharacters.IsMatch(currChar))
+            else if (LPD.PunctuationCharacters.IsMatch(currChar))
                 return HandlePunctuation();
 
             else throw new NotSupportedCharacterException(
@@ -301,7 +289,7 @@ namespace Compiler.General
             identifierSB.Append(_currentCharacter);
             _currentCharacter = GetNextChar();
 
-            while (Letters.IsMatch(_currentCharacter.ToString()))
+            while (LPD.Letters.IsMatch(_currentCharacter.ToString()))
             {
                 identifierSB.Append(_currentCharacter);
                 _currentCharacter = GetNextChar();
