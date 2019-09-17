@@ -178,18 +178,19 @@ namespace Compiler
 
         public async void RunCompiler()
         {
-            var ans = await Task.Run(() => {
-                try
+            bool ans = false;
+            try
+            {
+                ans = await Task.Run(() =>
                 {
                     var lexical = new Lexical();
                     return lexical.Run(TxtEditor.FilePath);
-                }
-                catch (Exception)
-                {
-                    UpdateScreenAlert("The compilation has failed.", true);
-                    return new Task<bool>(() => false);
-                }
-            });
+                });
+            }
+            catch (NotSupportedCharacterException e)
+            {
+                UpdateScreenAlert(e.Message, true);
+            }
 
             if (ans)
                 UpdateScreenAlert("Your file has been compiled successfully.", false);

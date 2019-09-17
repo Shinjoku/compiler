@@ -87,7 +87,7 @@
       <DependentUpon>Line.xaml</DependentUpon>
     </Compile>
     <Compile Include="Model\Code.cs" />
-    <Compile Include="Model\LPDInstructions.cs" />
+    <Compile Include="Model\LPD.cs" />
     <Compile Include="Model\PointerPosition.cs" />
     <Compile Include="Model\Token.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

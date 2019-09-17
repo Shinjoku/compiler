@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Compiler.General
@@ -15,39 +16,14 @@ namespace Compiler.General
         private bool _reachedEndOfFile;
         private char _currentCharacter;
 
-        #region Character Lists
+        #region Characters Lists
 
-        private readonly List<char> SpaceCharacters = new List<char>
-        {
-            ' ',
-            '\t',
-            '\n',
-            '\r'
-        };
-
-        private readonly List<char> ArithmeticOperators = new List<char>
-        {
-            '+',
-            '-',
-            '*'
-        };
-
-        private readonly List<char> RelationalOperators = new List<char>
-        {
-            '<',
-            '>',
-            '=',
-            '!'
-        };
-
-        private readonly List<char> PunctuationCharacters = new List<char>
-        {
-            ';',
-            ',',
-            '(',
-            ')',
-            '.'
-        };
+        private readonly Regex Letters = new Regex(@"[a-zA-Z_]");
+        private readonly Regex Digits = new Regex(@"[0-9]");
+        private readonly Regex ArithmeticOperators = new Regex(@"[+\-*]");
+        private readonly Regex RelationalOperators = new Regex(@"[<>=!]");
+        private readonly Regex PunctuationCharacters = new Regex(@"[;,.()]");
+        private readonly Regex SpaceCharacters = new Regex("[ \\t\\n\\r]");
 
         #endregion
 
@@ -98,7 +74,7 @@ namespace Compiler.General
 
         private void PassSpace()
         {
-            while (SpaceCharacters.Contains(_currentCharacter) && !_reachedEndOfFile)
+            while (SpaceCharacters.IsMatch(_currentCharacter.ToString()) && !_reachedEndOfFile)
             {
                 _currentCharacter = GetNextChar();
             }
@@ -109,6 +85,11 @@ namespace Compiler.General
             _file.Close();
         }
 
+        /// <summary>
+        /// For debug purposes.
+        /// </summary>
+        /// <param name="filePath">File path that will be used for the compilation.</param>
+        /// <returns></returns>
         public async Task<bool> Run(string filePath)
         {
             try
@@ -118,7 +99,7 @@ namespace Compiler.General
 
                 while (!_reachedEndOfFile)
                 {
-                    while((_currentCharacter == '{' || SpaceCharacters.Contains(_currentCharacter)) &&
+                    while((_currentCharacter == '{' || SpaceCharacters.IsMatch(_currentCharacter.ToString())) &&
                         !_reachedEndOfFile)
                     {
                         if (_currentCharacter == '{')
@@ -134,33 +115,36 @@ namespace Compiler.General
                 CloseFile();
                 return true;
             }
-            catch (Exception)
+            catch (NotSupportedCharacterException e)
             {
-                return false;
+                throw new NotSupportedCharacterException(e.Message);
             }
         }
 
         private Token GetToken()
         {
-            if (char.IsDigit(_currentCharacter))
+            var currChar = _currentCharacter.ToString();
+
+            if (Digits.IsMatch(currChar))
                 return HandleNumber();
 
-            else if (char.IsLetter(_currentCharacter))
+            else if (Letters.IsMatch(currChar))
                 return HandleIdentifierAndKeyWord();
 
             else if (_currentCharacter == ':')
                 return HandleAttribution();
 
-            else if (ArithmeticOperators.Contains(_currentCharacter))
+            else if (ArithmeticOperators.IsMatch(currChar))
                 return HandleArithmeticOperator();
 
-            else if (RelationalOperators.Contains(_currentCharacter))
+            else if (RelationalOperators.IsMatch(currChar))
                 return HandleRelationalOperators();
 
-            else if (PunctuationCharacters.Contains(_currentCharacter))
+            else if (PunctuationCharacters.IsMatch(currChar))
                 return HandlePunctuation();
 
-            else throw new NotSupportedCharacterException();
+            else throw new NotSupportedCharacterException(
+                "Not supported character on line " + _position.Line + ", at column " + _position.Column + ".");
         }
 
         private Token HandlePunctuation()
@@ -172,22 +156,22 @@ namespace Compiler.General
             {
                 case ';':
                     Console.WriteLine("Punctuation: {0}", _currentCharacter);
-                    result =  new Token((int)Token.LPDSymbol.DOT, symbol);
+                    result =  new Token((int)LPD.Symbol.DOT, symbol);
                     break;
 
                 case '.': 
                     Console.WriteLine("Punctuation: {0}", _currentCharacter);
-                    result = new Token((int)Token.LPDSymbol.DOT, symbol);
+                    result = new Token((int)LPD.Symbol.DOT, symbol);
                     break;
 
                 case '(':
                     Console.WriteLine("Punctuation: {0}", _currentCharacter);
-                    result = new Token((int)Token.LPDSymbol.OPEN_PARENTHESIS, symbol);
+                    result = new Token((int)LPD.Symbol.OPEN_PARENTHESIS, symbol);
                     break;
 
                 case ')':
                     Console.WriteLine("Punctuation: {0}", _currentCharacter);
-                    result = new Token((int)Token.LPDSymbol.CLOSE_PARENTHESIS, symbol);
+                    result = new Token((int)LPD.Symbol.CLOSE_PARENTHESIS, symbol);
                     break;
 
                 default:
@@ -212,12 +196,12 @@ namespace Compiler.General
                     {
                         op += _currentCharacter;
                         Console.WriteLine("Relational Operator: {0}", op);
-                        result = new Token((int)Token.LPDSymbol.GREATER_EQUAL, op);
+                        result = new Token((int)LPD.Symbol.GREATER_EQUAL, op);
                     }
                     else
                     {
                         Console.WriteLine("Relational Operator: {0}", op);
-                        result = new Token((int)Token.LPDSymbol.GREATER, op);
+                        result = new Token((int)LPD.Symbol.GREATER, op);
                     }
                     break;
 
@@ -227,18 +211,18 @@ namespace Compiler.General
                     {
                         op += _currentCharacter;
                         Console.WriteLine("Relational Operator: {0}", op);
-                        result = new Token((int)Token.LPDSymbol.LESSER_EQUAL, op);
+                        result = new Token((int)LPD.Symbol.LESSER_EQUAL, op);
                     }
                     else
                     {
                         Console.WriteLine("Relational Operator: {0}", op);
-                        result = new Token((int)Token.LPDSymbol.LESSER, op);
+                        result = new Token((int)LPD.Symbol.LESSER, op);
                     }
                     break;
 
                 case "=":
                     Console.WriteLine("Relational Operator: {0}", op);
-                    result = new Token((int)Token.LPDSymbol.EQUAL, op);
+                    result = new Token((int)LPD.Symbol.EQUAL, op);
                     break;
 
                 case "!":
@@ -247,7 +231,7 @@ namespace Compiler.General
                     {
                         op += _currentCharacter;
                         Console.WriteLine("Relational Operator: {0}", op);
-                        result = new Token((int)Token.LPDSymbol.DIFFERENT, op);
+                        result = new Token((int)LPD.Symbol.DIFFERENT, op);
                     }
                     else throw new Exception();
                     break;
@@ -269,21 +253,18 @@ namespace Compiler.General
             switch (_currentCharacter)
             {
                 case '+':
-                    _currentCharacter = GetNextChar();
                     Console.WriteLine("Arithmetic Operator: {0}", op);
-                    result = new Token((int)Token.LPDSymbol.PLUS, op);
+                    result = new Token((int)LPD.Symbol.PLUS, op);
                     break;
 
                 case '-':
-                    _currentCharacter = GetNextChar();
                     Console.WriteLine("Arithmetic Operator: {0}", op);
-                    result = new Token((int)Token.LPDSymbol.MINUS, op);
+                    result = new Token((int)LPD.Symbol.MINUS, op);
                     break;
 
                 case '*':
-                    _currentCharacter = GetNextChar();
                     Console.WriteLine("Arithmetic Operator: {0}", op);
-                    result = new Token((int)Token.LPDSymbol.MULTIPLICATION, op);
+                    result = new Token((int)LPD.Symbol.MULTIPLICATION, op);
                     break;
 
                 default:
@@ -303,13 +284,13 @@ namespace Compiler.General
             if(_currentCharacter != '=')
             {
                 Console.WriteLine("Attribution: {0}", characters);
-                return new Token((int)Token.LPDSymbol.COLON, characters);
+                return new Token((int)LPD.Symbol.COLON, characters);
             }
             else
             {
                 characters += _currentCharacter;
                 Console.WriteLine("Attribution: {0}", characters);
-                return new Token((int)Token.LPDSymbol.ATTRIBUTION, characters);
+                return new Token((int)LPD.Symbol.ATTRIBUTION, characters);
             }
         }
 
@@ -320,7 +301,7 @@ namespace Compiler.General
             identifierSB.Append(_currentCharacter);
             _currentCharacter = GetNextChar();
 
-            while (char.IsLetter(_currentCharacter))
+            while (Letters.IsMatch(_currentCharacter.ToString()))
             {
                 identifierSB.Append(_currentCharacter);
                 _currentCharacter = GetNextChar();
@@ -328,15 +309,15 @@ namespace Compiler.General
 
             var identifier = identifierSB.ToString();
 
-            if (Token.Keywords.ContainsKey(identifier))
+            if (LPD.Keywords.ContainsKey(identifier))
             {
                 Console.WriteLine("Keyword: {0}", identifier);
-                return new Token((int)Token.Keywords[identifier], identifier);
+                return new Token((int)LPD.Keywords[identifier], identifier);
             }
             else
             {
                 Console.WriteLine("Identifier: {0}", identifier);
-                return new Token((int)Token.LPDSymbol.IDENTIFIER, identifier);
+                return new Token((int)LPD.Symbol.IDENTIFIER, identifier);
             }
         }
 
@@ -354,12 +335,16 @@ namespace Compiler.General
             }
 
             Console.WriteLine("Number: {0}", number.ToString());
-            return new Token((int)Token.LPDSymbol.NUMBER, number.ToString());
+            return new Token((int)LPD.Symbol.NUMBER, number.ToString());
         }
     }
 
     /// <summary>
     /// For characters that are not supported in the current compiler.
     /// </summary>
-    class NotSupportedCharacterException : Exception { }
+    class NotSupportedCharacterException : Exception {
+        public NotSupportedCharacterException() : base() { }
+        public NotSupportedCharacterException(string message) : base(message) { }
+        public NotSupportedCharacterException(string message, System.Exception inner) : base(message, inner) { }
+    }
 }

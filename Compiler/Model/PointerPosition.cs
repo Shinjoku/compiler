@@ -13,8 +13,8 @@ namespace Compiler.Model
 
         public PointerPosition()
         {
-            Column = 0;
-            Line = 0;
+            Column = 1;
+            Line = 1;
         }
     }
 }
