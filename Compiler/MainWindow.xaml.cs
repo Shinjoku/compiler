@@ -95,7 +95,7 @@ namespace Compiler
             DataContext = this;
             KeyDown += RunCompiler_Event;
             KeyDown += SaveFile_KeyDown;
-            TxtEditor.UpdateAlert += m => UpdateScreenAlert(m, false);
+            TxtEditor.UpdateAlert += (m, isError) => UpdateScreenAlert(m, isError);
         }
 
         public void UpdateScreenAlert(string msg, bool isError)
@@ -150,8 +150,15 @@ namespace Compiler
             {
                 txtFilePath.Text = val;
                 TxtEditor.FilePath = val;
-                TxtEditor.UpdateFileContent();
-                UpdateScreenAlert("File loaded.", false);
+                try
+                {
+                    TxtEditor.UpdateFileContent();
+                    UpdateScreenAlert("File loaded.", false);
+                }
+                catch
+                {
+                    UpdateScreenAlert("Cannot read the file. Is it opened in another program?", true);
+                }
             };
 
             fileSelection.ShowDialog();                

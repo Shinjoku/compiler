@@ -14,8 +14,10 @@ namespace Compiler
     /// </summary>
     public partial class TextEditor : UserControl, INotifyPropertyChanged
     {
+        private object _fileAccessLock = new object();
+
         #region Properties
-        public event Action<string> UpdateAlert;
+        public event Action<string, bool> UpdateAlert;
         public string FilePath { get; set; }
         private string _fileContent;
         public string FileContent
@@ -53,13 +55,23 @@ namespace Compiler
         public string ReadFile()
         {
             var sb = new StringBuilder();
-            using (StreamReader sr = File.OpenText(FilePath))
+            try
             {
-                string currentLine;
-                while ((currentLine = sr.ReadLine()) != null)
+                lock (_fileAccessLock)
                 {
-                    sb.AppendLine(currentLine);
+                    using (StreamReader sr = File.OpenText(FilePath))
+                    {
+                        string currentLine;
+                        while ((currentLine = sr.ReadLine()) != null)
+                        {
+                            sb.AppendLine(currentLine);
+                        }
+                    }
                 }
+            }
+            catch (IOException)
+            {
+                UpdateAlert("Can't read file. Is it opened in another program?", true);
             }
 
             return sb.ToString();
@@ -69,27 +81,39 @@ namespace Compiler
         {
             Task.Run(() =>
             {
-                if (FilePath != string.Empty)
+                try
                 {
-                    using (var sw = new StreamWriter(FilePath))
+                    lock (_fileAccessLock)
                     {
-                        sw.Write(FileContent);
-                    }
+                        if (FilePath != string.Empty)
+                        {
+                            using (var sw = new StreamWriter(FilePath))
+                            {
+                                sw.Write(FileContent);
+                            }
 
-                    UpdateAlert("The file has been saved successfully.");
+                            UpdateAlert("The file has been saved successfully.", false);
+                        }
+                        else
+                        {
+                            var fileDialog = new OpenFileDialog();
+                            bool? result = fileDialog.ShowDialog();
+                            if (result == true && fileDialog.FileName != string.Empty)
+                            {
+                                File.Create(fileDialog.FileName);
+                                UpdateAlert("The file has been created successfully.", false);
+                            }
+                            else
+                                UpdateAlert("Can't create file.", true);
+
+                        }
+                    }
                 }
-                else
+                catch (IOException e)
                 {
-                    var fileDialog = new OpenFileDialog();
-                    bool? result = fileDialog.ShowDialog();
-                    if (result == true)
-                    {
-                        File.Create(fileDialog.FileName);
-                    }
-
-                    UpdateAlert("The file has been created successfully.");
+                    UpdateAlert("Can't read file. Is it opened in another program?", true);
                 }
-            });
+        });
         }
 
         #region Events

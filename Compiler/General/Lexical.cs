@@ -101,12 +101,15 @@ namespace Compiler.General
                         _tokens.Add(GetToken());
                 }
 
-                CloseFile();
                 return true;
             }
             catch (NotSupportedCharacterException e)
             {
                 throw new NotSupportedCharacterException(e.Message);
+            }
+            finally
+            {
+                CloseFile();
             }
         }
 
@@ -133,7 +136,9 @@ namespace Compiler.General
                 return HandlePunctuation();
 
             else throw new NotSupportedCharacterException(
-                "Not supported character on line " + Position.Line + ", at column " + Position.Column + ".");
+                "Not supported character '" + _currentCharacter +
+                "' on line " + Position.Line +
+                ", at column " + Position.Column + ".");
         }
 
         private Token HandlePunctuation()
@@ -145,7 +150,7 @@ namespace Compiler.General
             {
                 case ';':
                     Console.WriteLine("Punctuation: {0}", _currentCharacter);
-                    result =  new Token((int)LPD.Symbol.DOT, symbol);
+                    result =  new Token((int)LPD.Symbol.SEMICOLON, symbol);
                     break;
 
                 case '.': 
@@ -161,6 +166,10 @@ namespace Compiler.General
                 case ')':
                     Console.WriteLine("Punctuation: {0}", _currentCharacter);
                     result = new Token((int)LPD.Symbol.CLOSE_PARENTHESIS, symbol);
+                    break;
+                case ',':
+                    Console.WriteLine("Punctuation: {0}", _currentCharacter);
+                    result = new Token((int)LPD.Symbol.COMMA, symbol);
                     break;
 
                 default:
