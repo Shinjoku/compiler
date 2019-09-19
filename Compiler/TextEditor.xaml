@@ -17,9 +17,9 @@
                HorizontalAlignment="Center" VerticalAlignment="Center"/>
         <avalonEdit:TextEditor x:Name="Editor" Grid.Row="1" Padding="5" Background="LightGray"
                                xmlns:avalonEdit="http://icsharpcode.net/sharpdevelop/avalonedit"
-                               FontFamily="Consolas" SyntaxHighlighting="PASCAL"
-                               VerticalContentAlignment="Top" TabIndex="1" ShowLineNumbers="true"
-                               LineNumbersForeground="Black"
+                               FontFamily="Roboto" ShowLineNumbers="true"
+                               VerticalContentAlignment="Top" TabIndex="1"
+                               LineNumbersForeground="Black" 
                                FontSize="16"/>
     </Grid>
 </UserControl>
