@@ -79,7 +79,7 @@ namespace Compiler.General
         /// </summary>
         /// <param name="filePath">File path that will be used for the compilation.</param>
         /// <returns></returns>
-        public async Task<bool> Run(string filePath)
+        public bool Run(string filePath)
         {
             try
             {

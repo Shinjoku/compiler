@@ -6,6 +6,10 @@ using Microsoft.Win32;
 using System.Threading.Tasks;
 using System.ComponentModel;
 using System;
+using System.Reflection;
+using System.Xml;
+using ICSharpCode.AvalonEdit.Highlighting.Xshd;
+using ICSharpCode.AvalonEdit.Highlighting;
 
 namespace Compiler
 {
@@ -15,23 +19,11 @@ namespace Compiler
     public partial class TextEditor : UserControl, INotifyPropertyChanged
     {
         private object _fileAccessLock = new object();
+        private const string _syntaxFilePath = @"Properties\LPDHighlighting.xshd";
 
         #region Properties
         public event Action<string, bool> UpdateAlert;
         public string FilePath { get; set; }
-        private string _fileContent;
-        public string FileContent
-        {
-            get { return _fileContent; }
-            set
-            {
-                if (value != _fileContent)
-                {
-                    _fileContent = value;
-                    OnPropertyChanged("FileContent");
-                }
-            }
-        }
 
         public event PropertyChangedEventHandler PropertyChanged;
         protected void OnPropertyChanged(string propertyName)
@@ -44,12 +36,19 @@ namespace Compiler
         public TextEditor()
         {
             InitializeComponent();
-            Page.DataContext = this;
+            Editor.DataContext = this;
+            Editor.SyntaxHighlighting = HighlightingLoader.Load(GetSyntaxHighlighting(), HighlightingManager.Instance);
+        }
+
+        public static XmlTextReader GetSyntaxHighlighting()
+        {
+            string path = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), _syntaxFilePath);
+            return new XmlTextReader(path);
         }
 
         public void UpdateFileContent()
         {
-            FileContent = ReadFile();
+            Editor.Text = ReadFile();
         }
 
         public string ReadFile()
@@ -79,7 +78,7 @@ namespace Compiler
 
         public void SaveFile()
         {
-            Task.Run(() =>
+            App.Current.Dispatcher.BeginInvoke((Action)(() =>
             {
                 try
                 {
@@ -89,7 +88,7 @@ namespace Compiler
                         {
                             using (var sw = new StreamWriter(FilePath))
                             {
-                                sw.Write(FileContent);
+                                sw.Write(Editor.Text);
                             }
 
                             UpdateAlert("The file has been saved successfully.", false);
@@ -113,7 +112,7 @@ namespace Compiler
                 {
                     UpdateAlert("Can't read file. Is it opened in another program?", true);
                 }
-        });
+        }));
         }
 
         #region Events

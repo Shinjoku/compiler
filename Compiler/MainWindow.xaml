@@ -166,6 +166,7 @@
                         Text="{Binding Path=AlertMsg, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                         Foreground="{Binding Path=AlertColor, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                         Background="{Binding Path=Theme, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                        ScrollViewer.VerticalScrollBarVisibility="Visible"
                         VerticalAlignment="Top" TextWrapping="Wrap" TextAlignment="Center"/>
 
                     <env:VirtualMachine Grid.Row="1" x:Name="Vm"/>

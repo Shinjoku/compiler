@@ -98,12 +98,16 @@ namespace Compiler
             TxtEditor.UpdateAlert += (m, isError) => UpdateScreenAlert(m, isError);
         }
 
+        /// <summary>
+        /// Updates the screen alert with a new line of message.
+        /// </summary>
+        /// <param name="msg">Message to be written.</param>
+        /// <param name="isError">If it's an error message.</param>
         public void UpdateScreenAlert(string msg, bool isError)
         {
             Task.Run(() =>
             {
-                _alertCounter++;
-                var alertString = _alertCounter + ": " + msg + '\n';
+                var alertString = ++_alertCounter + ": " + msg + '\n';
                 AlertMsg += alertString;
 
                 if (isError) AlertColor = Brushes.Red;
@@ -170,7 +174,7 @@ namespace Compiler
                 try
                 {
                     return Vm.Run(
-                        AssemblyInstruction.ExtractAssemblyInstructions(TxtEditor.FileContent));
+                        AssemblyInstruction.ExtractAssemblyInstructions(TxtEditor.Editor.Text));
                 }
                 catch (Exception)
                 {
@@ -193,14 +197,16 @@ namespace Compiler
                     var lexical = new Lexical();
                     return lexical.Run(TxtEditor.FilePath);
                 });
+
+                if (ans)
+                    UpdateScreenAlert("Your file has been compiled successfully.", false);
             }
             catch (NotSupportedCharacterException e)
             {
                 UpdateScreenAlert(e.Message, true);
             }
 
-            if (ans)
-                UpdateScreenAlert("Your file has been compiled successfully.", false);
+
         }
 
         public void Run()

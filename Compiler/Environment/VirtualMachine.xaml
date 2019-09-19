@@ -35,8 +35,9 @@
                 <Label Grid.Row="0" Content="In" FontSize="20"
                                     HorizontalAlignment="Center"/>
                 <TextBlock Grid.Row="1" Name="In" FontSize="20"
-                         Text="{Binding Path=InputText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                         Background="LightGray" TextAlignment="Center"/>
+                           Style="{DynamicResource MaterialDesignTitleTextBlock}"
+                           Text="{Binding Path=InputText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                           Background="LightGray" TextAlignment="Center"/>
             </Grid>
         </Border>
 
@@ -51,7 +52,8 @@
                                        HorizontalAlignment="Center" VerticalAlignment="Center"/>
                 <TextBlock Grid.Row="1" Background="LightGray"
                            FontSize="20" TextAlignment="Center"
-                    Text="{Binding Path=OutputText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                           Style="{DynamicResource MaterialDesignTitleTextBlock}"
+                           Text="{Binding Path=OutputText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
             </Grid>
         </Border>
 
@@ -80,6 +82,7 @@
                 <Label Grid.Row="0" Content="Stack" FontSize="20"
                        HorizontalAlignment="Center" VerticalAlignment="Center"/>
                 <TextBlock FontSize="20" Grid.Row="1" Background="LightGray" TextAlignment="Center"
+                           Style="{DynamicResource MaterialDesignTitleTextBlock}"
                            Text="{Binding Path=Memory.DataStack,
                     Converter={StaticResource ListToStringConverter}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
             </Grid>
