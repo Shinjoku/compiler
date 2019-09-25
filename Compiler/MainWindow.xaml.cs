@@ -115,7 +115,7 @@ namespace Compiler
 
                 lock (_alertLock)
                 {
-                    Thread.Sleep(2500);
+                    Thread.Sleep(3500);
                     AlertMsg = AlertMsg.Replace(alertString, "");
                     _alertCounter--;
                 }
@@ -190,23 +190,22 @@ namespace Compiler
         public async void RunCompiler()
         {
             bool ans = false;
-            try
+            ans = await Task.Run(() =>
             {
-                ans = await Task.Run(() =>
+                try
                 {
                     var lexical = new Lexical();
                     return lexical.Run(TxtEditor.FilePath);
-                });
+                }
+                catch (NotSupportedCharacterException e)
+                {
+                    UpdateScreenAlert(e.Message, true);
+                    return false;
+                }
+            });
 
-                if (ans)
-                    UpdateScreenAlert("Your file has been compiled successfully.", false);
-            }
-            catch (NotSupportedCharacterException e)
-            {
-                UpdateScreenAlert(e.Message, true);
-            }
-
-
+            if (ans)
+                UpdateScreenAlert("Your file has been compiled successfully.", false);
         }
 
         public void Run()

@@ -115,6 +115,9 @@ namespace Compiler.General
 
         private Token GetToken()
         {
+            try
+            {
+
             var currChar = _currentCharacter.ToString();
 
             if (LPD.Digits.IsMatch(currChar))
@@ -139,6 +142,10 @@ namespace Compiler.General
                 "Not supported character '" + _currentCharacter +
                 "' on line " + Position.Line +
                 ", at column " + Position.Column + ".");
+            } catch (NotSupportedCharacterException e)
+            {
+                throw new NotSupportedCharacterException(e.Message);
+            }
         }
 
         private Token HandlePunctuation()
@@ -224,6 +231,7 @@ namespace Compiler.General
                     break;
 
                 case "!":
+                    var lastChar = _currentCharacter;
                     _currentCharacter = GetNextChar();
                     if (_currentCharacter == '=')
                     {
@@ -231,7 +239,11 @@ namespace Compiler.General
                         Console.WriteLine("Relational Operator: {0}", op);
                         result = new Token((int)LPD.Symbol.DIFFERENT, op);
                     }
-                    else throw new Exception();
+                    else throw new NotSupportedCharacterException(
+                        "Not supported character '" + lastChar +
+                        "' on line " + Position.Line +
+                        ", at column " + Position.Column + "." +
+                        " '!=' was expected.");
                     break;
 
                 default:
