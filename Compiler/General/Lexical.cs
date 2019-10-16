@@ -311,7 +311,8 @@ namespace Compiler.General
             identifierSB.Append(_currentCharacter);
             _currentCharacter = GetNextChar();
 
-            while (LPD.Letters.IsMatch(_currentCharacter.ToString()))
+            while (LPD.Letters.IsMatch(_currentCharacter.ToString()) ||
+                LPD.Digits.IsMatch(_currentCharacter.ToString()))
             {
                 identifierSB.Append(_currentCharacter);
                 _currentCharacter = GetNextChar();
