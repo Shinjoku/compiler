@@ -12,6 +12,7 @@ namespace Compiler
     {
 
         public event Action<string> SendFilePath;
+        public bool CompilerMode;
 
         public FileSelection()
         {
@@ -22,7 +23,7 @@ namespace Compiler
         {
             var fileDialog = new OpenFileDialog
             {
-                Filter = "Text documents (.txt)|*.txt"
+                Filter = CompilerMode ? "Pascal files (.pas)|*.pas" : "Assembly files (.obj)|*.obj"
             };
 
             bool? result = fileDialog.ShowDialog();
