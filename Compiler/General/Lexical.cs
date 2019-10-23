@@ -21,7 +21,7 @@ namespace Compiler.General
             _tokens = new List<Token>();
         }
 
-        private void OpenFile(string filePath)
+        public void OpenFile(string filePath)
         {
             _file = new StreamReader(filePath, Encoding.UTF8);
             Position = new PointerPosition();
@@ -69,7 +69,7 @@ namespace Compiler.General
             }
         }
 
-        private void CloseFile()
+        public void CloseFile()
         {
             _file.Close();
         }
@@ -98,7 +98,7 @@ namespace Compiler.General
                     }
 
                     if (!ReachedEndOfFile)
-                        _tokens.Add(GetToken());
+                        _tokens.Add(GetNextToken());
                 }
 
                 return true;
@@ -113,36 +113,50 @@ namespace Compiler.General
             }
         }
 
-        private Token GetToken()
+        private void PassCommentAndSpaces()
+        {
+            while ((_currentCharacter == '{' || LPD.SpaceCharacters.IsMatch(_currentCharacter.ToString())) &&
+                !ReachedEndOfFile)
+            {
+                if (_currentCharacter == '{')
+                    PassComment();
+
+                PassSpace();
+            }
+        }
+
+        public Token GetNextToken()
         {
             try
             {
+                PassCommentAndSpaces();
 
-            var currChar = _currentCharacter.ToString();
+                var currChar = _currentCharacter.ToString();
 
-            if (LPD.Digits.IsMatch(currChar))
-                return HandleNumber();
+                if (LPD.Digits.IsMatch(currChar))
+                    return HandleNumber();
 
-            else if (LPD.Letters.IsMatch(currChar))
-                return HandleIdentifierAndKeyWord();
+                else if (LPD.Letters.IsMatch(currChar))
+                    return HandleIdentifierAndKeyWord();
 
-            else if (_currentCharacter == ':')
-                return HandleAttribution();
+                else if (_currentCharacter == ':')
+                    return HandleAttribution();
 
-            else if (LPD.ArithmeticOperators.IsMatch(currChar))
-                return HandleArithmeticOperator();
+                else if (LPD.ArithmeticOperators.IsMatch(currChar))
+                    return HandleArithmeticOperator();
 
-            else if (LPD.RelationalOperators.IsMatch(currChar))
-                return HandleRelationalOperators();
+                else if (LPD.RelationalOperators.IsMatch(currChar))
+                    return HandleRelationalOperators();
 
-            else if (LPD.PunctuationCharacters.IsMatch(currChar))
-                return HandlePunctuation();
+                else if (LPD.PunctuationCharacters.IsMatch(currChar))
+                    return HandlePunctuation();
 
-            else throw new NotSupportedCharacterException(
-                "Not supported character '" + _currentCharacter +
-                "' on line " + Position.Line +
-                ", at column " + Position.Column + ".");
-            } catch (NotSupportedCharacterException e)
+                else throw new NotSupportedCharacterException(
+                    "Not supported character '" + _currentCharacter +
+                    "' on line " + Position.Line +
+                    ", at column " + Position.Column + ".");
+            }
+            catch (NotSupportedCharacterException e)
             {
                 throw new NotSupportedCharacterException(e.Message);
             }
@@ -300,6 +314,7 @@ namespace Compiler.General
             {
                 characters += _currentCharacter;
                 Console.WriteLine("Attribution: {0}", characters);
+                _currentCharacter = GetNextChar();
                 return new Token((int)LPD.Symbol.ATTRIBUTION, characters);
             }
         }

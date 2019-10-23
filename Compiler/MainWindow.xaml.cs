@@ -194,10 +194,11 @@ namespace Compiler
             {
                 try
                 {
-                    var lexical = new Lexical();
-                    return lexical.Run(TxtEditor.FilePath);
+                    // var lexical = new Lexical();
+                    var syntactic = new Syntactic();
+                    return syntactic.Run(TxtEditor.FilePath);
                 }
-                catch (NotSupportedCharacterException e)
+                catch (Exception e)
                 {
                     UpdateScreenAlert(e.Message, true);
                     return false;

@@ -80,7 +80,7 @@ namespace Compiler.Model
         public static readonly Regex ArithmeticOperators = new Regex(@"[+\-*]");
         public static readonly Regex RelationalOperators = new Regex(@"[<>=!]");
         public static readonly Regex PunctuationCharacters = new Regex(@"[;,.()]");
-        public static readonly Regex SpaceCharacters = new Regex("[ \\t\\n\\r]");
+        public static readonly Regex SpaceCharacters = new Regex("[ \\t\\n\\r\\0]");
 
         #endregion
     }
