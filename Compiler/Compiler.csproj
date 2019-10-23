@@ -53,6 +53,9 @@
   <PropertyGroup>
     <ApplicationIcon>Compiler.ico</ApplicationIcon>
   </PropertyGroup>
+  <PropertyGroup>
+    <RunPostBuildEvent>Always</RunPostBuildEvent>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="ICSharpCode.AvalonEdit, Version=5.0.3.0, Culture=neutral, PublicKeyToken=9cc39be672370310, processorArchitecture=MSIL">
       <HintPath>..\packages\AvalonEdit.5.0.4\lib\Net40\ICSharpCode.AvalonEdit.dll</HintPath>
@@ -187,8 +190,8 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PreBuildEvent>if not exist $(OutDir)\Properties mkdir $(OutDir)\Properties
-copy $(ProjectDir)\Properties\LPDHighlighting.xshd  .\Properties</PreBuildEvent>
+    <PreBuildEvent>if not exist $(TargetDir)\Properties mkdir $(TargetDir)\Properties
+copy $(ProjectDir)\Properties\LPDHighlighting.xshd  $(TargetDir)\Properties\LPDHighlighting.xshd</PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
     <PostBuildEvent>
