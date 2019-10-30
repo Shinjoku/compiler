@@ -216,6 +216,7 @@ namespace Compiler.General
                         op += _currentCharacter;
                         Console.WriteLine("Relational Operator: {0}", op);
                         result = new Token((int)LPD.Symbol.GREATER_EQUAL, op);
+                        _currentCharacter = GetNextChar();
                     }
                     else
                     {
@@ -231,6 +232,7 @@ namespace Compiler.General
                         op += _currentCharacter;
                         Console.WriteLine("Relational Operator: {0}", op);
                         result = new Token((int)LPD.Symbol.LESSER_EQUAL, op);
+                        _currentCharacter = GetNextChar();
                     }
                     else
                     {
@@ -252,6 +254,7 @@ namespace Compiler.General
                         op += _currentCharacter;
                         Console.WriteLine("Relational Operator: {0}", op);
                         result = new Token((int)LPD.Symbol.DIFFERENT, op);
+                        _currentCharacter = GetNextChar();
                     }
                     else throw new NotSupportedCharacterException(
                         "Not supported character '" + lastChar +
@@ -265,7 +268,6 @@ namespace Compiler.General
                     return null;
             }
 
-            _currentCharacter = GetNextChar();
             return result;
         }
 

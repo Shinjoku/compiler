@@ -212,7 +212,7 @@ namespace Compiler.General
             AnalyzeFactor();
             while(_currentToken.Symbol == (int)LPD.Symbol.MULTIPLICATION ||
                 _currentToken.Symbol == (int)LPD.Symbol.DIVISION||
-                _currentToken.Symbol == (int)LPD.Symbol.IF)
+                _currentToken.Symbol == (int)LPD.Symbol.AND)
             {
                 _currentToken = _lexical.GetNextToken();
                 AnalyzeFactor();
@@ -223,7 +223,7 @@ namespace Compiler.General
         {
             if (_currentToken.Symbol == (int)LPD.Symbol.IDENTIFIER)
             {
-                if (IsAValidVariable(_currentToken.Lexeme))
+                if (IsAValidIdentifier(_currentToken.Lexeme))
                 {
                     AnalyzeFunctionCall();
                 }
@@ -255,7 +255,7 @@ namespace Compiler.General
         private void AnalyzeFunctionCall()
         {
             _currentToken = _lexical.GetNextToken();
-
+            // TODO
             //if (_currentToken.Symbol == (int)LPD.Symbol.IDENTIFIER)
             //{
             //    _currentToken = _lexical.GetNextToken();
@@ -288,7 +288,7 @@ namespace Compiler.General
                 _currentToken = _lexical.GetNextToken();
                 if(_currentToken.Symbol == (int)LPD.Symbol.IDENTIFIER)
                 {
-                    if (IsAValidVariable(_currentToken.Lexeme))
+                    if (IsAValidIdentifier(_currentToken.Lexeme))
                     {
                         _currentToken = _lexical.GetNextToken();
                         if (_currentToken.Symbol == (int)LPD.Symbol.CLOSE_PARENTHESIS)
@@ -311,7 +311,7 @@ namespace Compiler.General
                 _currentToken = _lexical.GetNextToken();
                 if (_currentToken.Symbol == (int)LPD.Symbol.IDENTIFIER)
                 {
-                    if (IsAValidVariable(_currentToken.Lexeme))
+                    if (IsAValidIdentifier(_currentToken.Lexeme))
                     {
                         _currentToken = _lexical.GetNextToken();
 
@@ -343,7 +343,7 @@ namespace Compiler.General
 
         private void AnalyzeProcedureCall()
         {
-            _currentToken = _lexical.GetNextToken();
+            //_currentToken = _lexical.GetNextToken();
         }
 
         private void AnalyzeSubroutines()
@@ -351,7 +351,7 @@ namespace Compiler.General
             if(_currentToken.Symbol == (int)LPD.Symbol.PROCEDURE ||
                 _currentToken.Symbol == (int)LPD.Symbol.FUNCTION)
             {
-                //TODO: CodeGeneration
+                // TODO: CodeGeneration
             }
 
             while (_currentToken.Symbol == (int)LPD.Symbol.PROCEDURE ||
@@ -376,7 +376,7 @@ namespace Compiler.General
 
             if(_currentToken.Symbol == (int)LPD.Symbol.IDENTIFIER)
             {
-                if(!IsAValidVariable(_currentToken.Lexeme)) {
+                if(!IsAValidIdentifier(_currentToken.Lexeme)) {
                     Token function = _currentToken;
 
                     _currentToken = _lexical.GetNextToken();
@@ -386,7 +386,7 @@ namespace Compiler.General
                         if (_currentToken.Symbol == (int)LPD.Symbol.INTEGER ||
                             _currentToken.Symbol == (int)LPD.Symbol.BOOLEAN)
                         {
-                            //TODO: Should add the function type too
+                            // TODO: Should add the function type too
                             SymbolsTable.Add(new Symbol(function.Lexeme, 0, 0, false));
 
                             _currentToken = _lexical.GetNextToken();
@@ -408,13 +408,19 @@ namespace Compiler.General
 
             if (_currentToken.Symbol == (int)LPD.Symbol.IDENTIFIER)
             {
-                if(!IsAValidVariable(_currentToken.Lexeme)) {
+                if(!IsAValidIdentifier(_currentToken.Lexeme)) {
 
                     SymbolsTable.Add(new Symbol(_currentToken.Lexeme, 0, 0, false));
 
                     _currentToken = _lexical.GetNextToken();
                     if (_currentToken.Symbol == (int)LPD.Symbol.SEMICOLON)
+                    {
                         AnalyzeBlock();
+                        if (_currentToken.Symbol == (int)LPD.Symbol.SEMICOLON)
+                            _currentToken = _lexical.GetNextToken();
+                        else throw new UnexpectedTokenException(UnexpectedTokenMessage());
+                    }
+                        
                     else throw new UnexpectedTokenException(UnexpectedTokenMessage());
                 }
             }
@@ -506,7 +512,7 @@ namespace Compiler.General
                     ", column " + _lexical.Position.Column;
         }
 
-        private bool IsAValidVariable(string lexeme)
+        private bool IsAValidIdentifier(string lexeme)
         {
             var symbolList = SymbolsTable.Select(el => el.Label);
             return symbolList.Contains(lexeme);
