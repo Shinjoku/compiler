@@ -360,7 +360,7 @@ namespace Compiler.General
             if(_currentToken.Symbol == LPD.Symbol.PROCEDURE ||
                 _currentToken.Symbol == LPD.Symbol.FUNCTION)
             {
-                //TODO: CodeGeneration
+                // TODO: CodeGeneration
             }
 
             while (_currentToken.Symbol == LPD.Symbol.PROCEDURE ||
