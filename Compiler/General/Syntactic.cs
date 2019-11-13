@@ -60,16 +60,16 @@ namespace Compiler.General
                     {
                         AnalyzeBlock();
                         if (_currentToken.Symbol != LPD.Symbol.DOT)
-                            throw new UnexpectedTokenException(UnexpectedTokenMessage());
+                            throw new UnexpectedTokenException(UnexpectedTokenMessage("."));
                     }
                     else
-                        throw new UnexpectedTokenException(UnexpectedTokenMessage());
+                        throw new UnexpectedTokenException(UnexpectedTokenMessage(";"));
                 }
                 else
-                    throw new UnexpectedTokenException(UnexpectedTokenMessage());
+                    throw new UnexpectedTokenException(UnexpectedTokenMessage("identifier"));
             }
             else
-                throw new UnexpectedTokenException(UnexpectedTokenMessage());
+                throw new UnexpectedTokenException(UnexpectedTokenMessage("program"));
         }
 
         private void AnalyzeBlock()
@@ -97,17 +97,17 @@ namespace Compiler.General
                             AnalyzeSimpleCommand();
                         }
                     }
-                    else throw new UnexpectedTokenException(UnexpectedTokenMessage());
+                    else throw new UnexpectedTokenException(UnexpectedTokenMessage(";"));
                 }
                 // Is Symbol END, should get the next token
                 _currentToken = _lexical.GetNextToken();
             }
-            else throw new UnexpectedTokenException(UnexpectedTokenMessage());
+            else throw new UnexpectedTokenException(UnexpectedTokenMessage("fim"));
         }
 
         private void AnalyzeSimpleCommand()
         {
-            switch ((LPD.Symbol)_currentToken.Symbol)
+            switch (_currentToken.Symbol)
             {
                 case LPD.Symbol.IDENTIFIER:
                     AnalyzeAttributionOrProcedure();
@@ -145,7 +145,7 @@ namespace Compiler.General
                     AnalyzeSimpleCommand();
                 }
             }
-            else throw new UnexpectedTokenException(UnexpectedTokenMessage());
+            else throw new UnexpectedTokenException(UnexpectedTokenMessage("entao"));
         }
 
         private void AnalyzeWhile()
@@ -158,7 +158,7 @@ namespace Compiler.General
                 _currentToken = _lexical.GetNextToken();
                 AnalyzeSimpleCommand();
             }
-            else throw new UnexpectedTokenException(UnexpectedTokenMessage());
+            else throw new UnexpectedTokenException(UnexpectedTokenMessage("faca"));
         }
 
         private void AnalyzeExpression()
@@ -243,7 +243,7 @@ namespace Compiler.General
                 if (_currentToken.Symbol == LPD.Symbol.CLOSE_PARENTHESIS)
                     _currentToken = _lexical.GetNextToken();
 
-                else throw new UnexpectedTokenException(UnexpectedTokenMessage());
+                else throw new UnexpectedTokenException(UnexpectedTokenMessage(")"));
             }
             else if (_currentToken.Lexeme == "verdadeiro" ||
                 _currentToken.Lexeme == "falso")
@@ -293,13 +293,13 @@ namespace Compiler.General
                         _currentToken = _lexical.GetNextToken();
                         if (_currentToken.Symbol == LPD.Symbol.CLOSE_PARENTHESIS)
                             _currentToken = _lexical.GetNextToken();
-                        else throw new UnexpectedTokenException(UnexpectedTokenMessage());
+                        else throw new UnexpectedTokenException(UnexpectedTokenMessage(")"));
                     }
                     else throw new UndefinedIdentifierException(UndefinedIdentifierMessage("variable"));
                 }
-                else throw new UnexpectedTokenException(UnexpectedTokenMessage());
+                else throw new UnexpectedTokenException(UnexpectedTokenMessage("variable"));
             }
-            else throw new UnexpectedTokenException(UnexpectedTokenMessage());
+            else throw new UnexpectedTokenException(UnexpectedTokenMessage("("));
         }
 
         private void AnalyzeRead()
@@ -318,13 +318,13 @@ namespace Compiler.General
 
                         if (_currentToken.Symbol == LPD.Symbol.CLOSE_PARENTHESIS)
                             _currentToken = _lexical.GetNextToken();
-                        else throw new UnexpectedTokenException(UnexpectedTokenMessage());
+                        else throw new UnexpectedTokenException(UnexpectedTokenMessage(")"));
                     }
                     else throw new UndefinedIdentifierException(UndefinedIdentifierMessage("variable"));
                 }
-                else throw new UnexpectedTokenException(UnexpectedTokenMessage());
+                else throw new UnexpectedTokenException(UnexpectedTokenMessage("variable"));
             }
-            else throw new UnexpectedTokenException(UnexpectedTokenMessage());
+            else throw new UnexpectedTokenException(UnexpectedTokenMessage("("));
         }
 
         private void AnalyzeAttributionOrProcedure()
@@ -419,7 +419,7 @@ namespace Compiler.General
                 }
                 else throw new DuplicatedIdentifierException(DuplicatedIdentifierException(_currentToken.Lexeme));
             }
-            else throw new UnexpectedTokenException(UnexpectedTokenMessage());
+            else throw new UnexpectedTokenException(UnexpectedTokenMessage("identifier"));
         }
 
         private void AnalyzeProcedureDeclaration()
@@ -468,10 +468,10 @@ namespace Compiler.General
                         {
                             _currentToken = _lexical.GetNextToken();
                         }
-                        else throw new UnexpectedTokenException(UnexpectedTokenMessage());
+                        else throw new UnexpectedTokenException(UnexpectedTokenMessage(";"));
                     }
                 }
-                else throw new UnexpectedTokenException(UnexpectedTokenMessage());
+                else throw new UnexpectedTokenException(UnexpectedTokenMessage("identifier"));
             }
         }
 
@@ -492,7 +492,7 @@ namespace Compiler.General
                         {
                             _currentToken = _lexical.GetNextToken();
                             if(_currentToken.Symbol == LPD.Symbol.COLON)
-                                throw new UnexpectedTokenException(UnexpectedTokenMessage());
+                                throw new UnexpectedTokenException(UnexpectedTokenMessage("identifier"));
                         }
                         // Else is colon
                     }
@@ -543,7 +543,7 @@ namespace Compiler.General
             return "Unexpected token '" + _currentToken.Lexeme +
                     "' at line " + _lexical.Position.Line +
                     ", column " + _lexical.Position.Column +
-                    ". Expected '" + expectedToken + "'";
+                    ". Expected ' " + expectedToken + " '";
         }
 
         private string UndefinedIdentifierMessage(string type)
