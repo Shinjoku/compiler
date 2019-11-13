@@ -46,6 +46,8 @@ namespace Compiler.Model
             COLON,
             TRUE,
             FALSE,
+            UNARYPLUS,
+            UNARYMINUS
         }
 
         public enum IdentifierType
@@ -75,7 +77,7 @@ namespace Compiler.Model
             ["leia"] = Symbol.READ,
             ["var"] = Symbol.VARIABLE,
             ["inteiro"] = Symbol.INTEGER,
-            ["booleano"] = Symbol.BOOLEAN,
+            ["BOOLEANo"] = Symbol.BOOLEAN,
             ["verdadeiro"] = Symbol.TRUE,
             ["falso"] = Symbol.FALSE,
             ["procedimento"] = Symbol.PROCEDURE,
@@ -91,6 +93,47 @@ namespace Compiler.Model
             [IdentifierType.VARIABLE] = "Variable",
             [IdentifierType.PROCEDURE] = "Procedure",
             [IdentifierType.FUNCTION] = "Function",
+        };
+
+        public static readonly Dictionary<Symbol, int> OperatorsPriority = new Dictionary<Symbol, int>()
+        {
+            [Symbol.NOT] = 5,
+            [Symbol.UNARYPLUS] = 5,
+            [Symbol.UNARYMINUS] = 5,
+            [Symbol.MULTIPLICATION] = 4,
+            [Symbol.DIVISION] = 4,
+            [Symbol.PLUS] = 3,
+            [Symbol.MINUS] = 3,
+            [Symbol.GREATER] = 2,
+            [Symbol.GREATER_EQUAL] = 2,
+            [Symbol.LESSER] = 2,
+            [Symbol.LESSER_EQUAL] = 2,
+            [Symbol.DIFFERENT] = 2,
+            [Symbol.EQUAL] = 2,
+            [Symbol.AND] = 1,
+            [Symbol.OR] = 0,
+        };
+
+        private readonly Dictionary<Symbol, ValueType> _operatorsType = new Dictionary<Symbol, ValueType>
+        {
+            [Symbol.UNARYPLUS] = ValueType.INTEGER,
+            [Symbol.UNARYMINUS] = ValueType.INTEGER,
+            [Symbol.MULTIPLICATION] = ValueType.INTEGER,
+            [Symbol.DIVISION] = ValueType.INTEGER,
+            [Symbol.PLUS] = ValueType.INTEGER,
+            [Symbol.MINUS] = ValueType.INTEGER,
+            [Symbol.NOT] = ValueType.BOOLEAN,
+            [Symbol.GREATER] = ValueType.BOOLEAN,
+            [Symbol.GREATER_EQUAL] = ValueType.BOOLEAN,
+            [Symbol.LESSER] = ValueType.BOOLEAN,
+            [Symbol.LESSER_EQUAL] = ValueType.BOOLEAN,
+            [Symbol.DIFFERENT] = ValueType.BOOLEAN,
+            [Symbol.EQUAL] = ValueType.BOOLEAN,
+            [Symbol.AND] = ValueType.BOOLEAN,
+            [Symbol.OR] = ValueType.BOOLEAN,
+            [Symbol.NUMBER] = ValueType.INTEGER,
+            [Symbol.TRUE] = ValueType.BOOLEAN,
+            [Symbol.FALSE] = ValueType.BOOLEAN
         };
 
         #region Characters Lists

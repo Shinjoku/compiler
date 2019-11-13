@@ -91,6 +91,8 @@
       <DependentUpon>VirtualMachine.xaml</DependentUpon>
     </Compile>
     <Compile Include="General\Lexical.cs" />
+    <Compile Include="General\PostfixExpressionBuilder.cs" />
+    <Compile Include="General\Semantic.cs" />
     <Compile Include="General\SymbolsTable.cs" />
     <Compile Include="General\Syntactic.cs" />
     <Compile Include="Model\AssemblyInstruction.cs" />
