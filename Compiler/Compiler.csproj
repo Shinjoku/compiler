@@ -91,12 +91,15 @@
       <DependentUpon>VirtualMachine.xaml</DependentUpon>
     </Compile>
     <Compile Include="General\Lexical.cs" />
+    <Compile Include="General\SymbolsTable.cs" />
     <Compile Include="General\Syntactic.cs" />
     <Compile Include="Model\AssemblyInstruction.cs" />
     <Compile Include="Line.xaml.cs">
       <DependentUpon>Line.xaml</DependentUpon>
     </Compile>
     <Compile Include="Model\Code.cs" />
+    <Compile Include="Model\TypedSymbol.cs" />
+    <Compile Include="Model\Interfaces\IAnalyzable.cs" />
     <Compile Include="Model\LPD.cs" />
     <Compile Include="Model\PointerPosition.cs" />
     <Compile Include="Model\Symbol.cs" />
@@ -190,6 +193,7 @@
     <Resource Include="Resources\Compiler.ico" />
     <Resource Include="Resources\VMRun.ico" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>if not exist $(TargetDir)\Properties mkdir $(TargetDir)\Properties

@@ -108,7 +108,7 @@ namespace Compiler
                         }
                     }
                 }
-                catch (IOException e)
+                catch (IOException)
                 {
                     UpdateAlert("Can't read file. Is it opened in another program?", true);
                 }

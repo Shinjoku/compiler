@@ -1,4 +1,5 @@
 ﻿using Compiler.Model;
+using Compiler.Model.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,16 +8,18 @@ using System.Threading.Tasks;
 
 namespace Compiler.General
 {
-    public class Syntactic
+    public class Syntactic : IAnalyzable
     {
         private Token _currentToken;
         private Lexical _lexical;
-        protected List<Symbol> SymbolsTable;
+        private SymbolsTable _symbolsTable;
+        private uint _scope;
 
         public Syntactic()
         {
+            _scope = 0;
             _lexical = new Lexical();
-            SymbolsTable = new List<Symbol>();
+            _symbolsTable = new SymbolsTable();
         }
 
         public bool Run(string filePath)
@@ -47,16 +50,16 @@ namespace Compiler.General
 
         private void AnalyzeProgram()
         {
-            if (_currentToken.Symbol == (int)LPD.Symbol.PROGRAM)
+            if (_currentToken.Symbol == LPD.Symbol.PROGRAM)
             {
                 _currentToken = _lexical.GetNextToken();
-                if (_currentToken.Symbol == (int)LPD.Symbol.IDENTIFIER)
+                if (_currentToken.Symbol == LPD.Symbol.IDENTIFIER)
                 {
                     _currentToken = _lexical.GetNextToken();
-                    if (_currentToken.Symbol == (int)LPD.Symbol.SEMICOLON)
+                    if (_currentToken.Symbol == LPD.Symbol.SEMICOLON)
                     {
                         AnalyzeBlock();
-                        if (_currentToken.Symbol != (int)LPD.Symbol.DOT)
+                        if (_currentToken.Symbol != LPD.Symbol.DOT)
                             throw new UnexpectedTokenException(UnexpectedTokenMessage());
                     }
                     else
@@ -79,17 +82,17 @@ namespace Compiler.General
 
         private void AnalyzeCommands()
         {
-            if (_currentToken.Symbol == (int)LPD.Symbol.BEGIN)
+            if (_currentToken.Symbol == LPD.Symbol.BEGIN)
             {
                 _currentToken = _lexical.GetNextToken();
 
                 AnalyzeSimpleCommand();
-                while (_currentToken.Symbol != (int)LPD.Symbol.END)
+                while (_currentToken.Symbol != LPD.Symbol.END)
                 {
-                    if (_currentToken.Symbol == (int)LPD.Symbol.SEMICOLON)
+                    if (_currentToken.Symbol == LPD.Symbol.SEMICOLON)
                     {
                         _currentToken = _lexical.GetNextToken();
-                        if (_currentToken.Symbol != (int)LPD.Symbol.END)
+                        if (_currentToken.Symbol != LPD.Symbol.END)
                         {
                             AnalyzeSimpleCommand();
                         }
@@ -132,11 +135,11 @@ namespace Compiler.General
             _currentToken = _lexical.GetNextToken();
             AnalyzeExpression();
 
-            if (_currentToken.Symbol == (int)LPD.Symbol.THEN)
+            if (_currentToken.Symbol == LPD.Symbol.THEN)
             {
                 _currentToken = _lexical.GetNextToken();
                 AnalyzeSimpleCommand();
-                if (_currentToken.Symbol == (int)LPD.Symbol.ELSE)
+                if (_currentToken.Symbol == LPD.Symbol.ELSE)
                 {
                     _currentToken = _lexical.GetNextToken();
                     AnalyzeSimpleCommand();
@@ -150,7 +153,7 @@ namespace Compiler.General
             _currentToken = _lexical.GetNextToken();
             AnalyzeExpression();
 
-            if (_currentToken.Symbol == (int)LPD.Symbol.DO)
+            if (_currentToken.Symbol == LPD.Symbol.DO)
             {
                 _currentToken = _lexical.GetNextToken();
                 AnalyzeSimpleCommand();
@@ -162,12 +165,12 @@ namespace Compiler.General
         {
             AnalyzeSimpleExpression();
 
-            if (_currentToken.Symbol == (int)LPD.Symbol.GREATER ||
-                _currentToken.Symbol == (int)LPD.Symbol.GREATER_EQUAL ||
-                _currentToken.Symbol == (int)LPD.Symbol.LESSER ||
-                _currentToken.Symbol == (int)LPD.Symbol.LESSER_EQUAL ||
-                _currentToken.Symbol == (int)LPD.Symbol.EQUAL ||
-                _currentToken.Symbol == (int)LPD.Symbol.DIFFERENT)
+            if (_currentToken.Symbol == LPD.Symbol.GREATER ||
+                _currentToken.Symbol == LPD.Symbol.GREATER_EQUAL ||
+                _currentToken.Symbol == LPD.Symbol.LESSER ||
+                _currentToken.Symbol == LPD.Symbol.LESSER_EQUAL ||
+                _currentToken.Symbol == LPD.Symbol.EQUAL ||
+                _currentToken.Symbol == LPD.Symbol.DIFFERENT)
             {
                 _currentToken = _lexical.GetNextToken();
                 AnalyzeSimpleExpression();
@@ -176,43 +179,31 @@ namespace Compiler.General
 
         private void AnalyzeSimpleExpression()
         {
+
+            if (_currentToken.Symbol == LPD.Symbol.PLUS ||
+                _currentToken.Symbol == LPD.Symbol.MINUS)
+            {
+                // Identificou mais e menos unarios
+                _currentToken = _lexical.GetNextToken();
+            }
+
             AnalyzeTerm();
 
-            if (_currentToken.Symbol == (int)LPD.Symbol.PLUS ||
-                _currentToken.Symbol == (int)LPD.Symbol.MINUS ||
-                _currentToken.Symbol == (int)LPD.Symbol.OR ||
-                _currentToken.Symbol == (int)LPD.Symbol.GREATER ||
-                _currentToken.Symbol == (int)LPD.Symbol.GREATER_EQUAL ||
-                _currentToken.Symbol == (int)LPD.Symbol.LESSER ||
-                _currentToken.Symbol == (int)LPD.Symbol.LESSER_EQUAL ||
-                _currentToken.Symbol == (int)LPD.Symbol.EQUAL ||
-                _currentToken.Symbol == (int)LPD.Symbol.DIFFERENT)
+            while (_currentToken.Symbol == LPD.Symbol.PLUS ||
+                _currentToken.Symbol == LPD.Symbol.MINUS ||
+                _currentToken.Symbol == LPD.Symbol.OR)
             {
                 _currentToken = _lexical.GetNextToken();
                 AnalyzeTerm();
-
-                while (_currentToken.Symbol == (int)LPD.Symbol.PLUS ||
-                        _currentToken.Symbol == (int)LPD.Symbol.MINUS ||
-                        _currentToken.Symbol == (int)LPD.Symbol.OR ||
-                        _currentToken.Symbol == (int)LPD.Symbol.GREATER ||
-                        _currentToken.Symbol == (int)LPD.Symbol.GREATER_EQUAL ||
-                        _currentToken.Symbol == (int)LPD.Symbol.LESSER ||
-                        _currentToken.Symbol == (int)LPD.Symbol.LESSER_EQUAL ||
-                        _currentToken.Symbol == (int)LPD.Symbol.EQUAL ||
-                        _currentToken.Symbol == (int)LPD.Symbol.DIFFERENT)
-                {
-                    _currentToken = _lexical.GetNextToken();
-                    AnalyzeTerm();
-                }
             }
         }
 
         private void AnalyzeTerm()
         {
             AnalyzeFactor();
-            while(_currentToken.Symbol == (int)LPD.Symbol.MULTIPLICATION ||
-                _currentToken.Symbol == (int)LPD.Symbol.DIVISION||
-                _currentToken.Symbol == (int)LPD.Symbol.IF)
+            while(_currentToken.Symbol == LPD.Symbol.MULTIPLICATION ||
+                _currentToken.Symbol == LPD.Symbol.DIVISION||
+                _currentToken.Symbol == LPD.Symbol.AND)
             {
                 _currentToken = _lexical.GetNextToken();
                 AnalyzeFactor();
@@ -221,27 +212,35 @@ namespace Compiler.General
 
         private void AnalyzeFactor()
         {
-            if (_currentToken.Symbol == (int)LPD.Symbol.IDENTIFIER)
+            if (_currentToken.Symbol == LPD.Symbol.IDENTIFIER)
             {
-                if (IsAValidVariable(_currentToken.Lexeme))
+                Symbol symbol = _symbolsTable.GetSymbol(_currentToken.Lexeme);
+                if (symbol == null)
+                    throw new UndefinedIdentifierException(UndefinedIdentifierMessage("identifier"));
+
+                if (symbol.IdentifierType == LPD.IdentifierType.FUNCTION)
                 {
                     AnalyzeFunctionCall();
                 }
-                else throw new UndefinedIdentifierException(UndefinedIdentifierMessage());
+                else
+                {
+                    // add variable to expression analyzer
+                    _currentToken = _lexical.GetNextToken();
+                }
             }
-            else if (_currentToken.Symbol == (int)LPD.Symbol.NUMBER)
+            else if (_currentToken.Symbol == LPD.Symbol.NUMBER)
                 _currentToken = _lexical.GetNextToken();
-            else if (_currentToken.Symbol == (int)LPD.Symbol.NOT)
+            else if (_currentToken.Symbol == LPD.Symbol.NOT)
             {
                 _currentToken = _lexical.GetNextToken();
                 AnalyzeFactor();
             }
-            else if (_currentToken.Symbol == (int)LPD.Symbol.OPEN_PARENTHESIS)
+            else if (_currentToken.Symbol == LPD.Symbol.OPEN_PARENTHESIS)
             {
                 _currentToken = _lexical.GetNextToken();
                 AnalyzeExpression();
 
-                if (_currentToken.Symbol == (int)LPD.Symbol.CLOSE_PARENTHESIS)
+                if (_currentToken.Symbol == LPD.Symbol.CLOSE_PARENTHESIS)
                     _currentToken = _lexical.GetNextToken();
 
                 else throw new UnexpectedTokenException(UnexpectedTokenMessage());
@@ -256,17 +255,17 @@ namespace Compiler.General
         {
             _currentToken = _lexical.GetNextToken();
 
-            //if (_currentToken.Symbol == (int)LPD.Symbol.IDENTIFIER)
+            //if (_currentToken.Symbol == LPD.Symbol.IDENTIFIER)
             //{
             //    _currentToken = _lexical.GetNextToken();
-            //    if (_currentToken.Symbol == (int)LPD.Symbol.COLON)
+            //    if (_currentToken.Symbol == LPD.Symbol.COLON)
             //    {
             //        _currentToken = _lexical.GetNextToken();
-            //        if (_currentToken.Symbol == (int)LPD.Symbol.INTEGER ||
-            //            _currentToken.Symbol == (int)LPD.Symbol.BOOLEAN)
+            //        if (_currentToken.Symbol == LPD.Symbol.INTEGER ||
+            //            _currentToken.Symbol == LPD.Symbol.BOOLEAN)
             //        {
             //            _currentToken = _lexical.GetNextToken();
-            //            if (_currentToken.Symbol == (int)LPD.Symbol.SEMICOLON)
+            //            if (_currentToken.Symbol == LPD.Symbol.SEMICOLON)
             //            {
             //                AnalyzeBlock();
             //            }
@@ -283,19 +282,20 @@ namespace Compiler.General
         {
             _currentToken = _lexical.GetNextToken();
 
-            if(_currentToken.Symbol == (int)LPD.Symbol.OPEN_PARENTHESIS)
+            if(_currentToken.Symbol == LPD.Symbol.OPEN_PARENTHESIS)
             {
                 _currentToken = _lexical.GetNextToken();
-                if(_currentToken.Symbol == (int)LPD.Symbol.IDENTIFIER)
+                if(_currentToken.Symbol == LPD.Symbol.IDENTIFIER)
                 {
-                    if (IsAValidVariable(_currentToken.Lexeme))
+                    //SEMANTIC
+                    if (_symbolsTable.IsAValidVariable(_currentToken.Lexeme))
                     {
                         _currentToken = _lexical.GetNextToken();
-                        if (_currentToken.Symbol == (int)LPD.Symbol.CLOSE_PARENTHESIS)
+                        if (_currentToken.Symbol == LPD.Symbol.CLOSE_PARENTHESIS)
                             _currentToken = _lexical.GetNextToken();
                         else throw new UnexpectedTokenException(UnexpectedTokenMessage());
                     }
-                    else throw new UndefinedIdentifierException(UndefinedIdentifierMessage());
+                    else throw new UndefinedIdentifierException(UndefinedIdentifierMessage("variable"));
                 }
                 else throw new UnexpectedTokenException(UnexpectedTokenMessage());
             }
@@ -306,20 +306,21 @@ namespace Compiler.General
         {
             _currentToken = _lexical.GetNextToken();
 
-            if (_currentToken.Symbol == (int)LPD.Symbol.OPEN_PARENTHESIS)
+            if (_currentToken.Symbol == LPD.Symbol.OPEN_PARENTHESIS)
             {
                 _currentToken = _lexical.GetNextToken();
-                if (_currentToken.Symbol == (int)LPD.Symbol.IDENTIFIER)
+                if (_currentToken.Symbol == LPD.Symbol.IDENTIFIER)
                 {
-                    if (IsAValidVariable(_currentToken.Lexeme))
+                    // SEMANTIC
+                    if (_symbolsTable.IsAValidVariable(_currentToken.Lexeme))
                     {
                         _currentToken = _lexical.GetNextToken();
 
-                        if (_currentToken.Symbol == (int)LPD.Symbol.CLOSE_PARENTHESIS)
+                        if (_currentToken.Symbol == LPD.Symbol.CLOSE_PARENTHESIS)
                             _currentToken = _lexical.GetNextToken();
                         else throw new UnexpectedTokenException(UnexpectedTokenMessage());
                     }
-                    else throw new UndefinedIdentifierException(UndefinedIdentifierMessage());
+                    else throw new UndefinedIdentifierException(UndefinedIdentifierMessage("variable"));
                 }
                 else throw new UnexpectedTokenException(UnexpectedTokenMessage());
             }
@@ -328,42 +329,50 @@ namespace Compiler.General
 
         private void AnalyzeAttributionOrProcedure()
         {
+            Token oldToken = _currentToken;
             _currentToken = _lexical.GetNextToken();
-            if (_currentToken.Symbol == (int)LPD.Symbol.ATTRIBUTION)
-                AnalyzeAttribution();
+            if (_currentToken.Symbol == LPD.Symbol.ATTRIBUTION)
+                AnalyzeAttribution(oldToken);
             else
-                AnalyzeProcedureCall();
+                AnalyzeProcedureCall(oldToken);
         }
 
-        private void AnalyzeAttribution()
+        private void AnalyzeAttribution(Token variable)
         {
+            if (!_symbolsTable.IsAValidVariable(variable.Lexeme))
+                throw new UndefinedIdentifierException(UndefinedIdentifierMessage("variable", variable.Lexeme));
             _currentToken = _lexical.GetNextToken();
             AnalyzeExpression();
         }
 
-        private void AnalyzeProcedureCall()
+        private void AnalyzeProcedureCall(Token procedure)
         {
-            _currentToken = _lexical.GetNextToken();
+            // SEMANTIC
+            if (!_symbolsTable.IsAValidProcedure(procedure.Lexeme))
+                throw new UndefinedIdentifierException(UndefinedIdentifierMessage("procedure", procedure.Lexeme));
+            // --------
+
+            // Code Generator CALL
         }
 
         private void AnalyzeSubroutines()
         {
-            if(_currentToken.Symbol == (int)LPD.Symbol.PROCEDURE ||
-                _currentToken.Symbol == (int)LPD.Symbol.FUNCTION)
+            if(_currentToken.Symbol == LPD.Symbol.PROCEDURE ||
+                _currentToken.Symbol == LPD.Symbol.FUNCTION)
             {
                 //TODO: CodeGeneration
             }
 
-            while (_currentToken.Symbol == (int)LPD.Symbol.PROCEDURE ||
-                _currentToken.Symbol == (int)LPD.Symbol.FUNCTION)
+            while (_currentToken.Symbol == LPD.Symbol.PROCEDURE ||
+                _currentToken.Symbol == LPD.Symbol.FUNCTION)
             {
-                if (_currentToken.Symbol == (int)LPD.Symbol.PROCEDURE)
+                if (_currentToken.Symbol == LPD.Symbol.PROCEDURE)
                     AnalyzeProcedureDeclaration();
 
-                else if (_currentToken.Symbol == (int)LPD.Symbol.FUNCTION)
+                else if (_currentToken.Symbol == LPD.Symbol.FUNCTION)
                     AnalyzeFunctionDeclaration();
 
-                else if (_currentToken.Symbol == (int)LPD.Symbol.SEMICOLON)
+                else if (_currentToken.Symbol == LPD.Symbol.SEMICOLON)
                     _currentToken = _lexical.GetNextToken();
 
                 else throw new UnexpectedTokenException(UnexpectedTokenMessage());
@@ -374,30 +383,41 @@ namespace Compiler.General
         {
             _currentToken = _lexical.GetNextToken();
 
-            if(_currentToken.Symbol == (int)LPD.Symbol.IDENTIFIER)
+            if(_currentToken.Symbol == LPD.Symbol.IDENTIFIER)
             {
-                if(!IsAValidVariable(_currentToken.Lexeme)) {
+                // SEMANTIC
+                if(!_symbolsTable.IsAValidVariable(_currentToken.Lexeme))
+                {
                     Token function = _currentToken;
 
                     _currentToken = _lexical.GetNextToken();
-                    if(_currentToken.Symbol == (int)LPD.Symbol.COLON)
+
+                    if (_currentToken.Symbol == LPD.Symbol.COLON)
                     {
                         _currentToken = _lexical.GetNextToken();
-                        if (_currentToken.Symbol == (int)LPD.Symbol.INTEGER ||
-                            _currentToken.Symbol == (int)LPD.Symbol.BOOLEAN)
+                        if (_currentToken.Symbol == LPD.Symbol.INTEGER ||
+                            _currentToken.Symbol == LPD.Symbol.BOOLEAN)
                         {
                             //TODO: Should add the function type too
-                            SymbolsTable.Add(new Symbol(function.Lexeme, 0, 0, false));
+                            _symbolsTable.Add(new TypedSymbol(function.Lexeme, _scope, LPD.IdentifierType.FUNCTION));
 
                             _currentToken = _lexical.GetNextToken();
-                            if (_currentToken.Symbol == (int)LPD.Symbol.SEMICOLON)
+                            if (_currentToken.Symbol == LPD.Symbol.SEMICOLON)
+                            {
                                 AnalyzeBlock();
+                                if (_currentToken.Symbol == LPD.Symbol.SEMICOLON)
+                                {
+                                    _currentToken = _lexical.GetNextToken();
+                                }
+                                else throw new UnexpectedTokenException(UnexpectedTokenMessage(";"));
+                            }
+                            
                         }
                         else throw new UnexpectedTokenException(UnexpectedTokenMessage());
                     }
-                    else throw new UnexpectedTokenException(UnexpectedTokenMessage());
+                    else throw new UnexpectedTokenException(UnexpectedTokenMessage(":"));
                 }
-                else throw new UnexpectedTokenException(UnexpectedTokenMessage());
+                else throw new DuplicatedIdentifierException(DuplicatedIdentifierException(_currentToken.Lexeme));
             }
             else throw new UnexpectedTokenException(UnexpectedTokenMessage());
         }
@@ -406,34 +426,45 @@ namespace Compiler.General
         {
             _currentToken = _lexical.GetNextToken();
 
-            if (_currentToken.Symbol == (int)LPD.Symbol.IDENTIFIER)
+            if (_currentToken.Symbol == LPD.Symbol.IDENTIFIER)
             {
-                if(!IsAValidVariable(_currentToken.Lexeme)) {
+                // SEMANTIC
+                if(!_symbolsTable.IsAValidProcedure(_currentToken.Lexeme)) {
 
-                    SymbolsTable.Add(new Symbol(_currentToken.Lexeme, 0, 0, false));
+                    _symbolsTable.Add(new Symbol(_currentToken.Lexeme, _scope, LPD.IdentifierType.PROCEDURE));
+                    _scope += 1;
 
                     _currentToken = _lexical.GetNextToken();
-                    if (_currentToken.Symbol == (int)LPD.Symbol.SEMICOLON)
+                    if (_currentToken.Symbol == LPD.Symbol.SEMICOLON)
+                    {
                         AnalyzeBlock();
-                    else throw new UnexpectedTokenException(UnexpectedTokenMessage());
+                        if (_currentToken.Symbol == LPD.Symbol.SEMICOLON)
+                        {
+                            _currentToken = _lexical.GetNextToken();
+                        }
+                        else throw new UnexpectedTokenException(UnexpectedTokenMessage(";"));
+                    }
+                    else throw new UnexpectedTokenException(UnexpectedTokenMessage(";"));
                 }
             }
-            else throw new UnexpectedTokenException(UnexpectedTokenMessage());
+            else throw new UnexpectedTokenException(UnexpectedTokenMessage("identifier"));
+
+            _symbolsTable.RemoveUntil(_scope++);
         }
 
         private void AnalyzeVariablesStage()
         {
             // This case is optional
-            if (_currentToken.Symbol == (int)LPD.Symbol.VARIABLE)
+            if (_currentToken.Symbol == LPD.Symbol.VARIABLE)
             {
                 
                 _currentToken = _lexical.GetNextToken();
-                if(_currentToken.Symbol == (int)LPD.Symbol.IDENTIFIER)
+                if(_currentToken.Symbol == LPD.Symbol.IDENTIFIER)
                 {
-                    while(_currentToken.Symbol == (int)LPD.Symbol.IDENTIFIER)
+                    while(_currentToken.Symbol == LPD.Symbol.IDENTIFIER)
                     {
                         AnalyzeVariables();
-                        if(_currentToken.Symbol == (int)LPD.Symbol.SEMICOLON)
+                        if(_currentToken.Symbol == LPD.Symbol.SEMICOLON)
                         {
                             _currentToken = _lexical.GetNextToken();
                         }
@@ -450,17 +481,17 @@ namespace Compiler.General
 
             do
             {
-                if (_currentToken.Symbol == (int)LPD.Symbol.IDENTIFIER)
+                if (_currentToken.Symbol == LPD.Symbol.IDENTIFIER)
                 {
                     variables.Add(_currentToken);
                     _currentToken = _lexical.GetNextToken();
-                    if(_currentToken.Symbol == (int)LPD.Symbol.COMMA ||
-                        _currentToken.Symbol == (int)LPD.Symbol.COLON)
+                    if(_currentToken.Symbol == LPD.Symbol.COMMA ||
+                        _currentToken.Symbol == LPD.Symbol.COLON)
                     {
-                        if(_currentToken.Symbol == (int)LPD.Symbol.COMMA)
+                        if(_currentToken.Symbol == LPD.Symbol.COMMA)
                         {
                             _currentToken = _lexical.GetNextToken();
-                            if(_currentToken.Symbol == (int)LPD.Symbol.COLON)
+                            if(_currentToken.Symbol == LPD.Symbol.COLON)
                                 throw new UnexpectedTokenException(UnexpectedTokenMessage());
                         }
                         // Else is colon
@@ -468,22 +499,29 @@ namespace Compiler.General
                     else throw new UnexpectedTokenException(UnexpectedTokenMessage());
                 }
                 else throw new UnexpectedTokenException(UnexpectedTokenMessage());
-            } while (_currentToken.Symbol != (int)LPD.Symbol.COLON);
+            } while (_currentToken.Symbol != LPD.Symbol.COLON);
 
             _currentToken = _lexical.GetNextToken();
-            int type = AnalyzeType();
+            LPD.ValueType valueType = AnalyzeValueType();
 
             foreach (var var in variables)
-                SymbolsTable.Add(new Symbol(var.Lexeme, type, 0, true));
+                _symbolsTable.Add(new TypedSymbol(var.Lexeme, _scope, LPD.IdentifierType.VARIABLE, valueType));
         }
 
-        private int AnalyzeType()
+        private LPD.ValueType AnalyzeValueType()
         {
-            int type = 0;
-            if (_currentToken.Symbol != (int)LPD.Symbol.INTEGER &&
-                _currentToken.Symbol != (int)LPD.Symbol.BOOLEAN)
+            LPD.ValueType type;
+            LPD.Symbol symbol = _currentToken.Symbol;
+
+            if (symbol != LPD.Symbol.INTEGER && symbol != LPD.Symbol.BOOLEAN)
                 throw new UnexpectedTokenException(UnexpectedTokenMessage());
-            else type = _currentToken.Symbol;
+            else
+            {
+                if (symbol == LPD.Symbol.INTEGER)
+                    type = LPD.ValueType.INTEGER;
+                else
+                    type = LPD.ValueType.BOOLEAN;
+            }
 
             _currentToken = _lexical.GetNextToken();
             return type;
@@ -499,17 +537,34 @@ namespace Compiler.General
                     "' at line " + _lexical.Position.Line +
                     ", column " + _lexical.Position.Column;
         }
-        private string UndefinedIdentifierMessage()
+
+        private string UnexpectedTokenMessage(string expectedToken)
         {
-            return "Undefined variable '" + _currentToken.Lexeme +
+            return "Unexpected token '" + _currentToken.Lexeme +
+                    "' at line " + _lexical.Position.Line +
+                    ", column " + _lexical.Position.Column +
+                    ". Expected '" + expectedToken + "'";
+        }
+
+        private string UndefinedIdentifierMessage(string type)
+        {
+            return "Undefined " + type + " '" + _currentToken.Lexeme +
                     "' at line " + _lexical.Position.Line +
                     ", column " + _lexical.Position.Column;
         }
 
-        private bool IsAValidVariable(string lexeme)
+        private string UndefinedIdentifierMessage(string type, string lexeme)
         {
-            var symbolList = SymbolsTable.Select(el => el.Label);
-            return symbolList.Contains(lexeme);
+            return "Undefined " + type + " '" + lexeme +
+                    "' at line " + _lexical.Position.Line +
+                    ", column " + _lexical.Position.Column;
+        }
+
+        private string DuplicatedIdentifierException(string identifierType)
+        {
+            return "Duplicated " + identifierType + " '" + _currentToken.Lexeme +
+                    "' at line " + _lexical.Position.Line +
+                    ", column " + _lexical.Position.Column;
         }
 
         #endregion
@@ -527,5 +582,12 @@ namespace Compiler.General
         public UndefinedIdentifierException() : base() { }
         public UndefinedIdentifierException(string message) : base(message) { }
         public UndefinedIdentifierException(string message, Exception inner) : base(message, inner) { }
+    }
+
+    class DuplicatedIdentifierException : Exception
+    {
+        public DuplicatedIdentifierException() : base() { }
+        public DuplicatedIdentifierException(string message) : base(message) { }
+        public DuplicatedIdentifierException(string message, Exception inner) : base(message, inner) { }
     }
 }

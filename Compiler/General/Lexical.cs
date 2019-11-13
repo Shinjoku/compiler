@@ -1,4 +1,5 @@
 ﻿using Compiler.Model;
+using Compiler.Model.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -7,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Compiler.General
 {
-    class Lexical
+    class Lexical : IAnalyzable
     {
         private StreamReader _file;
         private List<Token> _tokens;
@@ -171,26 +172,26 @@ namespace Compiler.General
             {
                 case ';':
                     Console.WriteLine("Punctuation: {0}", _currentCharacter);
-                    result =  new Token((int)LPD.Symbol.SEMICOLON, symbol);
+                    result =  new Token(LPD.Symbol.SEMICOLON, symbol);
                     break;
 
                 case '.': 
                     Console.WriteLine("Punctuation: {0}", _currentCharacter);
-                    result = new Token((int)LPD.Symbol.DOT, symbol);
+                    result = new Token(LPD.Symbol.DOT, symbol);
                     break;
 
                 case '(':
                     Console.WriteLine("Punctuation: {0}", _currentCharacter);
-                    result = new Token((int)LPD.Symbol.OPEN_PARENTHESIS, symbol);
+                    result = new Token(LPD.Symbol.OPEN_PARENTHESIS, symbol);
                     break;
 
                 case ')':
                     Console.WriteLine("Punctuation: {0}", _currentCharacter);
-                    result = new Token((int)LPD.Symbol.CLOSE_PARENTHESIS, symbol);
+                    result = new Token(LPD.Symbol.CLOSE_PARENTHESIS, symbol);
                     break;
                 case ',':
                     Console.WriteLine("Punctuation: {0}", _currentCharacter);
-                    result = new Token((int)LPD.Symbol.COMMA, symbol);
+                    result = new Token(LPD.Symbol.COMMA, symbol);
                     break;
 
                 default:
@@ -215,12 +216,12 @@ namespace Compiler.General
                     {
                         op += _currentCharacter;
                         Console.WriteLine("Relational Operator: {0}", op);
-                        result = new Token((int)LPD.Symbol.GREATER_EQUAL, op);
+                        result = new Token(LPD.Symbol.GREATER_EQUAL, op);
                     }
                     else
                     {
                         Console.WriteLine("Relational Operator: {0}", op);
-                        result = new Token((int)LPD.Symbol.GREATER, op);
+                        result = new Token(LPD.Symbol.GREATER, op);
                     }
                     break;
 
@@ -230,18 +231,18 @@ namespace Compiler.General
                     {
                         op += _currentCharacter;
                         Console.WriteLine("Relational Operator: {0}", op);
-                        result = new Token((int)LPD.Symbol.LESSER_EQUAL, op);
+                        result = new Token(LPD.Symbol.LESSER_EQUAL, op);
                     }
                     else
                     {
                         Console.WriteLine("Relational Operator: {0}", op);
-                        result = new Token((int)LPD.Symbol.LESSER, op);
+                        result = new Token(LPD.Symbol.LESSER, op);
                     }
                     break;
 
                 case "=":
                     Console.WriteLine("Relational Operator: {0}", op);
-                    result = new Token((int)LPD.Symbol.EQUAL, op);
+                    result = new Token(LPD.Symbol.EQUAL, op);
                     break;
 
                 case "!":
@@ -251,7 +252,7 @@ namespace Compiler.General
                     {
                         op += _currentCharacter;
                         Console.WriteLine("Relational Operator: {0}", op);
-                        result = new Token((int)LPD.Symbol.DIFFERENT, op);
+                        result = new Token(LPD.Symbol.DIFFERENT, op);
                     }
                     else throw new NotSupportedCharacterException(
                         "Not supported character '" + lastChar +
@@ -278,17 +279,17 @@ namespace Compiler.General
             {
                 case '+':
                     Console.WriteLine("Arithmetic Operator: {0}", op);
-                    result = new Token((int)LPD.Symbol.PLUS, op);
+                    result = new Token(LPD.Symbol.PLUS, op);
                     break;
 
                 case '-':
                     Console.WriteLine("Arithmetic Operator: {0}", op);
-                    result = new Token((int)LPD.Symbol.MINUS, op);
+                    result = new Token(LPD.Symbol.MINUS, op);
                     break;
 
                 case '*':
                     Console.WriteLine("Arithmetic Operator: {0}", op);
-                    result = new Token((int)LPD.Symbol.MULTIPLICATION, op);
+                    result = new Token(LPD.Symbol.MULTIPLICATION, op);
                     break;
 
                 default:
@@ -308,14 +309,14 @@ namespace Compiler.General
             if(_currentCharacter != '=')
             {
                 Console.WriteLine("Attribution: {0}", characters);
-                return new Token((int)LPD.Symbol.COLON, characters);
+                return new Token(LPD.Symbol.COLON, characters);
             }
             else
             {
                 characters += _currentCharacter;
                 Console.WriteLine("Attribution: {0}", characters);
                 _currentCharacter = GetNextChar();
-                return new Token((int)LPD.Symbol.ATTRIBUTION, characters);
+                return new Token(LPD.Symbol.ATTRIBUTION, characters);
             }
         }
 
@@ -338,12 +339,12 @@ namespace Compiler.General
             if (LPD.Keywords.ContainsKey(identifier))
             {
                 Console.WriteLine("Keyword: {0}", identifier);
-                return new Token((int)LPD.Keywords[identifier], identifier);
+                return new Token(LPD.Keywords[identifier], identifier);
             }
             else
             {
                 Console.WriteLine("Identifier: {0}", identifier);
-                return new Token((int)LPD.Symbol.IDENTIFIER, identifier);
+                return new Token(LPD.Symbol.IDENTIFIER, identifier);
             }
         }
 
@@ -361,7 +362,7 @@ namespace Compiler.General
             }
 
             Console.WriteLine("Number: {0}", number.ToString());
-            return new Token((int)LPD.Symbol.NUMBER, number.ToString());
+            return new Token(LPD.Symbol.NUMBER, number.ToString());
         }
     }
 

@@ -48,6 +48,19 @@ namespace Compiler.Model
             FALSE,
         }
 
+        public enum IdentifierType
+        {
+            VARIABLE,
+            PROCEDURE,
+            FUNCTION
+        }
+
+        public enum ValueType
+        {
+            INTEGER,
+            BOOLEAN,
+        }
+
         public static readonly Dictionary<string, Symbol> Keywords = new Dictionary<string, Symbol>()
         {
             ["programa"] = Symbol.PROGRAM,
@@ -71,6 +84,13 @@ namespace Compiler.Model
             ["e"] = Symbol.AND,
             ["ou"] = Symbol.OR,
             ["nao"] = Symbol.NOT
+        };
+
+        public static readonly Dictionary<IdentifierType, string> IdentifierTypes = new Dictionary<IdentifierType, string>()
+        {
+            [IdentifierType.VARIABLE] = "Variable",
+            [IdentifierType.PROCEDURE] = "Procedure",
+            [IdentifierType.FUNCTION] = "Function",
         };
 
         #region Characters Lists

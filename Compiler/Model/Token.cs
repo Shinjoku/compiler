@@ -1,11 +1,14 @@
-﻿namespace Compiler.Model
+﻿using Compiler.Model;
+
+
+namespace Compiler.Model
 {
     class Token
     {
-        public int Symbol;
+        public LPD.Symbol Symbol;
         public string Lexeme;
 
-        public Token(int symbol, string lexeme)
+        public Token(LPD.Symbol symbol, string lexeme)
         {
             Symbol = symbol;
             Lexeme = lexeme;
