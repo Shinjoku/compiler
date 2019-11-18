@@ -14,12 +14,14 @@ namespace Compiler.General
         private Lexical _lexical;
         private SymbolsTable _symbolsTable;
         private uint _scope;
+        protected PostfixExpressionBuilder _expression;
 
         public Syntactic()
         {
             _scope = 0;
             _lexical = new Lexical();
             _symbolsTable = new SymbolsTable();
+            _expression = new PostfixExpressionBuilder();
         }
 
         public bool Run(string filePath)
@@ -172,6 +174,7 @@ namespace Compiler.General
                 _currentToken.Symbol == LPD.Symbol.EQUAL ||
                 _currentToken.Symbol == LPD.Symbol.DIFFERENT)
             {
+                _expression.Stack(_currentToken);
                 _currentToken = _lexical.GetNextToken();
                 AnalyzeSimpleExpression();
             }
@@ -214,11 +217,11 @@ namespace Compiler.General
         {
             if (_currentToken.Symbol == LPD.Symbol.IDENTIFIER)
             {
-                Symbol symbol = _symbolsTable.GetSymbol(_currentToken.Lexeme);
+                Token symbol = _symbolsTable.GetSymbol(_currentToken.Lexeme);
                 if (symbol == null)
                     throw new UndefinedIdentifierException(UndefinedIdentifierMessage("identifier"));
 
-                if (symbol.IdentifierType == LPD.IdentifierType.FUNCTION)
+                if (symbol.Symbol == LPD.Symbol.FUNCTION)
                 {
                     AnalyzeFunctionCall();
                 }
@@ -399,7 +402,7 @@ namespace Compiler.General
                             _currentToken.Symbol == LPD.Symbol.BOOLEAN)
                         {
                             //TODO: Should add the function type too
-                            _symbolsTable.Add(new TypedSymbol(function.Lexeme, _scope, LPD.IdentifierType.FUNCTION));
+                            _symbolsTable.Add(new Token(LPD.Symbol.FUNCTION, function.Lexeme, _scope, _currentToken.Symbol));
 
                             _currentToken = _lexical.GetNextToken();
                             if (_currentToken.Symbol == LPD.Symbol.SEMICOLON)
@@ -431,7 +434,7 @@ namespace Compiler.General
                 // SEMANTIC
                 if(!_symbolsTable.IsAValidProcedure(_currentToken.Lexeme)) {
 
-                    _symbolsTable.Add(new Symbol(_currentToken.Lexeme, _scope, LPD.IdentifierType.PROCEDURE));
+                    _symbolsTable.Add(new Token(LPD.Symbol.PROCEDURE, _currentToken.Lexeme, _scope));
                     _scope += 1;
 
                     _currentToken = _lexical.GetNextToken();
@@ -502,15 +505,15 @@ namespace Compiler.General
             } while (_currentToken.Symbol != LPD.Symbol.COLON);
 
             _currentToken = _lexical.GetNextToken();
-            LPD.ValueType valueType = AnalyzeValueType();
+            LPD.Symbol valueType = AnalyzeValueType();
 
             foreach (var var in variables)
-                _symbolsTable.Add(new TypedSymbol(var.Lexeme, _scope, LPD.IdentifierType.VARIABLE, valueType));
+                _symbolsTable.Add(new Token(LPD.Symbol.VARIABLE, var.Lexeme, _scope,  valueType));
         }
 
-        private LPD.ValueType AnalyzeValueType()
+        private LPD.Symbol AnalyzeValueType()
         {
-            LPD.ValueType type;
+            LPD.Symbol type;
             LPD.Symbol symbol = _currentToken.Symbol;
 
             if (symbol != LPD.Symbol.INTEGER && symbol != LPD.Symbol.BOOLEAN)
@@ -518,9 +521,9 @@ namespace Compiler.General
             else
             {
                 if (symbol == LPD.Symbol.INTEGER)
-                    type = LPD.ValueType.INTEGER;
+                    type = LPD.Symbol.INTEGER;
                 else
-                    type = LPD.ValueType.BOOLEAN;
+                    type = LPD.Symbol.BOOLEAN;
             }
 
             _currentToken = _lexical.GetNextToken();

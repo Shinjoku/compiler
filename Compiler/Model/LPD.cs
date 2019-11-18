@@ -3,7 +3,7 @@ using System.Text.RegularExpressions;
 
 namespace Compiler.Model
 {
-    public abstract class LPD
+    public static class LPD
     {
         public enum Symbol
         {
@@ -50,13 +50,6 @@ namespace Compiler.Model
             UNARYMINUS
         }
 
-        public enum IdentifierType
-        {
-            VARIABLE,
-            PROCEDURE,
-            FUNCTION
-        }
-
         public enum ValueType
         {
             INTEGER,
@@ -88,11 +81,11 @@ namespace Compiler.Model
             ["nao"] = Symbol.NOT
         };
 
-        public static readonly Dictionary<IdentifierType, string> IdentifierTypes = new Dictionary<IdentifierType, string>()
+        public static readonly Dictionary<Symbol, string> IdentifierTypes = new Dictionary<Symbol, string>()
         {
-            [IdentifierType.VARIABLE] = "Variable",
-            [IdentifierType.PROCEDURE] = "Procedure",
-            [IdentifierType.FUNCTION] = "Function",
+            [Symbol.VARIABLE] = "Variable",
+            [Symbol.PROCEDURE] = "Procedure",
+            [Symbol.FUNCTION] = "Function",
         };
 
         public static readonly Dictionary<Symbol, int> OperatorsPriority = new Dictionary<Symbol, int>()
@@ -114,7 +107,7 @@ namespace Compiler.Model
             [Symbol.OR] = 0,
         };
 
-        private readonly Dictionary<Symbol, ValueType> _operatorsType = new Dictionary<Symbol, ValueType>
+        public static Dictionary<Symbol, ValueType> OperatorsType = new Dictionary<Symbol, ValueType>
         {
             [Symbol.UNARYPLUS] = ValueType.INTEGER,
             [Symbol.UNARYMINUS] = ValueType.INTEGER,

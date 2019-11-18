@@ -7,19 +7,19 @@ namespace Compiler.General
 {
     class SymbolsTable
     {
-        private List<Symbol> _symbolsList;
+        private List<Token> _symbolsList;
 
         public SymbolsTable()
         {
-            _symbolsList = new List<Symbol>();
+            _symbolsList = new List<Token>();
         }
 
-        public SymbolsTable(IEnumerable<Symbol> symbolsList)
+        public SymbolsTable(IEnumerable<Token> symbolsList)
         {
-            _symbolsList = new List<Symbol>(symbolsList);
+            _symbolsList = new List<Token>(symbolsList);
         }
 
-        public void Add(Symbol symbol)
+        public void Add(Token symbol)
         {
             _symbolsList.Add(symbol);
         }
@@ -29,36 +29,36 @@ namespace Compiler.General
             _symbolsList = _symbolsList.Where(s => s.Scope < scope).ToList();
         }
 
-        public Symbol GetSymbol(string lexeme)
+        public Token GetSymbol(string lexeme)
         {
-            return _symbolsList.Where(s => s.Label == lexeme).LastOrDefault();
+            return _symbolsList.Where(s => s.Lexeme == lexeme).LastOrDefault();
         }
 
         public bool IsAValidVariable(string lexeme)
         {
             var variable = _symbolsList
                 .Select(el => el)
-                .Where(el => el.IdentifierType == LPD.IdentifierType.VARIABLE && el.Label == lexeme)
+                .Where(el => el.Symbol == LPD.Symbol.VARIABLE && el.Lexeme == lexeme)
                 .FirstOrDefault();
-            return variable?.Label.Equals(lexeme) ?? false;
+            return variable?.Lexeme.Equals(lexeme) ?? false;
         }
 
         public bool IsAValidProcedure(string lexeme)
         {
             var procedure = _symbolsList
                 .Select(el => el)
-                .Where(el => el.IdentifierType == LPD.IdentifierType.PROCEDURE && el.Label == lexeme)
+                .Where(el => el.Symbol == LPD.Symbol.PROCEDURE && el.Lexeme == lexeme)
                 .FirstOrDefault();
-            return procedure?.Label.Equals(lexeme) ?? false;
+            return procedure?.Lexeme.Equals(lexeme) ?? false;
         }
 
         public bool IsAValidFunction(string lexeme)
         {
             var function = _symbolsList
                 .Select(el => el)
-                .Where(el => el.IdentifierType == LPD.IdentifierType.FUNCTION && el.Label == lexeme)
+                .Where(el => el.Symbol == LPD.Symbol.FUNCTION && el.Lexeme == lexeme)
                 .FirstOrDefault();
-            return function?.Label.Equals(lexeme) ?? false;
+            return function?.Lexeme.Equals(lexeme) ?? false;
         }
 
     }
