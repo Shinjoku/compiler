@@ -100,11 +100,9 @@
       <DependentUpon>Line.xaml</DependentUpon>
     </Compile>
     <Compile Include="Model\Code.cs" />
-    <Compile Include="Model\TypedSymbol.cs" />
     <Compile Include="Model\Interfaces\IAnalyzable.cs" />
     <Compile Include="Model\LPD.cs" />
     <Compile Include="Model\PointerPosition.cs" />
-    <Compile Include="Model\Symbol.cs" />
     <Compile Include="Model\Token.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TextEditor.xaml.cs">

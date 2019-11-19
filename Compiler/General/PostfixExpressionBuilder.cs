@@ -7,39 +7,57 @@ namespace Compiler.General
 {
     public class PostfixExpressionBuilder
     {
-        private StringBuilder _postfixExpression;
+        public List<Token> Expression { get; }
         private Stack<Token> _operatorsStack;
 
         public PostfixExpressionBuilder()
         {
-            _postfixExpression = new StringBuilder();
+            Expression = new List<Token>();
             _operatorsStack = new Stack<Token>();
         }
 
         public void Stack(Token t)
         {
-            while (LPD.OperatorsPriority[_operatorsStack.First().Symbol] > LPD.OperatorsPriority[t.Symbol])
-            {
-                Unstack();
-            }
 
-            if (LPD.IdentifierTypes.Keys.Contains(t.Symbol))
-                _postfixExpression.Append(t.Lexeme);
+            if (LPD.IdentifierTypes.ContainsKey(t.Symbol))
+            {
+                Expression.Add(t);
+            }
             else
+            {
+                if (_operatorsStack.Count > 0 && t.Symbol != LPD.Symbol.OPEN_PARENTHESIS)
+                { 
+                    while (LPD.OperatorsPriority[_operatorsStack.First().Symbol] > LPD.OperatorsPriority[t.Symbol])
+                    {
+                        Unstack();
+                    }
+                }
                 _operatorsStack.Push(t);
+            }
         }
 
         private void Unstack()
         {
-            _postfixExpression.Append(_operatorsStack.Pop());
+            Expression.Add(_operatorsStack.Pop());
         }
 
-        public override string ToString()
+        public void UnstackUntilParenthesis()
+        {
+            while(_operatorsStack.FirstOrDefault()?.Symbol != LPD.Symbol.OPEN_PARENTHESIS)
+            {
+                Unstack();
+            }
+
+            // Removes the open parenthesis
+            _operatorsStack.Pop();
+        }
+
+        public List<Token> ToList()
         {
             while (_operatorsStack.Count != 0)
                 Unstack();
 
-            return _postfixExpression.ToString();
+            return Expression;
         }
     }
 }

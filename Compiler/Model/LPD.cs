@@ -70,7 +70,7 @@ namespace Compiler.Model
             ["leia"] = Symbol.READ,
             ["var"] = Symbol.VARIABLE,
             ["inteiro"] = Symbol.INTEGER,
-            ["BOOLEANo"] = Symbol.BOOLEAN,
+            ["booleano"] = Symbol.BOOLEAN,
             ["verdadeiro"] = Symbol.TRUE,
             ["falso"] = Symbol.FALSE,
             ["procedimento"] = Symbol.PROCEDURE,
@@ -83,6 +83,8 @@ namespace Compiler.Model
 
         public static readonly Dictionary<Symbol, string> IdentifierTypes = new Dictionary<Symbol, string>()
         {
+            [Symbol.IDENTIFIER] = "Identifier",
+            [Symbol.NUMBER] = "Number",
             [Symbol.VARIABLE] = "Variable",
             [Symbol.PROCEDURE] = "Procedure",
             [Symbol.FUNCTION] = "Function",

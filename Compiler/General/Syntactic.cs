@@ -14,14 +14,14 @@ namespace Compiler.General
         private Lexical _lexical;
         private SymbolsTable _symbolsTable;
         private uint _scope;
-        protected PostfixExpressionBuilder _expression;
+        private Semantic _semantic;
 
         public Syntactic()
         {
             _scope = 0;
             _lexical = new Lexical();
+            _semantic = new Semantic();
             _symbolsTable = new SymbolsTable();
-            _expression = new PostfixExpressionBuilder();
         }
 
         public bool Run(string filePath)
@@ -41,6 +41,10 @@ namespace Compiler.General
             catch (UndefinedIdentifierException ex)
             {
                 throw ex;
+            }
+            catch(Exception generalEx)
+            {
+                throw new Exception(generalEx.Message + " at line " + _lexical.Position.Line);
             }
             finally
             {
@@ -174,7 +178,7 @@ namespace Compiler.General
                 _currentToken.Symbol == LPD.Symbol.EQUAL ||
                 _currentToken.Symbol == LPD.Symbol.DIFFERENT)
             {
-                _expression.Stack(_currentToken);
+                _semantic.AddToExpression(_currentToken);
                 _currentToken = _lexical.GetNextToken();
                 AnalyzeSimpleExpression();
             }
@@ -186,6 +190,7 @@ namespace Compiler.General
             if (_currentToken.Symbol == LPD.Symbol.PLUS ||
                 _currentToken.Symbol == LPD.Symbol.MINUS)
             {
+                _semantic.AddToExpression(_currentToken);
                 // Identificou mais e menos unarios
                 _currentToken = _lexical.GetNextToken();
             }
@@ -196,6 +201,7 @@ namespace Compiler.General
                 _currentToken.Symbol == LPD.Symbol.MINUS ||
                 _currentToken.Symbol == LPD.Symbol.OR)
             {
+                _semantic.AddToExpression(_currentToken);
                 _currentToken = _lexical.GetNextToken();
                 AnalyzeTerm();
             }
@@ -221,6 +227,8 @@ namespace Compiler.General
                 if (symbol == null)
                     throw new UndefinedIdentifierException(UndefinedIdentifierMessage("identifier"));
 
+                _semantic.AddToExpression(_currentToken);
+
                 if (symbol.Symbol == LPD.Symbol.FUNCTION)
                 {
                     AnalyzeFunctionCall();
@@ -232,53 +240,43 @@ namespace Compiler.General
                 }
             }
             else if (_currentToken.Symbol == LPD.Symbol.NUMBER)
+            {
+                _semantic.AddToExpression(_currentToken);
                 _currentToken = _lexical.GetNextToken();
+            }
             else if (_currentToken.Symbol == LPD.Symbol.NOT)
             {
+                _semantic.AddToExpression(_currentToken);
                 _currentToken = _lexical.GetNextToken();
                 AnalyzeFactor();
             }
             else if (_currentToken.Symbol == LPD.Symbol.OPEN_PARENTHESIS)
             {
+                _semantic.AddToExpression(_currentToken);
                 _currentToken = _lexical.GetNextToken();
                 AnalyzeExpression();
 
                 if (_currentToken.Symbol == LPD.Symbol.CLOSE_PARENTHESIS)
+                {
+                    _semantic.UnstackUntilOpenParenthesis();
                     _currentToken = _lexical.GetNextToken();
+                }
 
                 else throw new UnexpectedTokenException(UnexpectedTokenMessage(")"));
             }
             else if (_currentToken.Lexeme == "verdadeiro" ||
                 _currentToken.Lexeme == "falso")
+            {
+                _semantic.AddToExpression(_currentToken);
                 _currentToken = _lexical.GetNextToken();
+            }
             else throw new UnexpectedTokenException(UnexpectedTokenMessage());
         }
 
         private void AnalyzeFunctionCall()
         {
+            _semantic.AddToExpression(_currentToken);
             _currentToken = _lexical.GetNextToken();
-
-            //if (_currentToken.Symbol == LPD.Symbol.IDENTIFIER)
-            //{
-            //    _currentToken = _lexical.GetNextToken();
-            //    if (_currentToken.Symbol == LPD.Symbol.COLON)
-            //    {
-            //        _currentToken = _lexical.GetNextToken();
-            //        if (_currentToken.Symbol == LPD.Symbol.INTEGER ||
-            //            _currentToken.Symbol == LPD.Symbol.BOOLEAN)
-            //        {
-            //            _currentToken = _lexical.GetNextToken();
-            //            if (_currentToken.Symbol == LPD.Symbol.SEMICOLON)
-            //            {
-            //                AnalyzeBlock();
-            //            }
-            //            else throw new UnexpectedTokenException(UnexpectedTokenMessage());
-            //        }
-            //        else throw new UnexpectedTokenException(UnexpectedTokenMessage());
-            //    }
-            //    else throw new UnexpectedTokenException(UnexpectedTokenMessage());
-            //}
-            //else throw new UnexpectedTokenException(UnexpectedTokenMessage());
         }
 
         private void AnalyzeWrite()
@@ -432,8 +430,8 @@ namespace Compiler.General
             if (_currentToken.Symbol == LPD.Symbol.IDENTIFIER)
             {
                 // SEMANTIC
-                if(!_symbolsTable.IsAValidProcedure(_currentToken.Lexeme)) {
-
+                if(!_symbolsTable.IsAValidProcedure(_currentToken.Lexeme))
+                {
                     _symbolsTable.Add(new Token(LPD.Symbol.PROCEDURE, _currentToken.Lexeme, _scope));
                     _scope += 1;
 
